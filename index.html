@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SiatkaPiwo</title>
-	<link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#F57C00">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SiatkaPiwo">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F57C00">
     
     <style>
-        /* ZMIENNE KOLORYSTYCZNE - DOMYŚLNIE JASNY MOTYW */
+        /* ZMIENNE KOLORYSTYCZNE - SYSTEMOWY JASNY/CIEMNY MOTYW */
         :root {
             --bg-color: #f4f4f9;
             --text-color: #333333;
@@ -21,7 +21,6 @@
             --input-bg: #ffffff;
         }
 
-        /* JEŚLI SYSTEM JEST W TRYBIE CIEMNYM - PODMIENIAMY KOLORY */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-color: #121212;
@@ -41,7 +40,7 @@
             align-items: center;
             padding: 20px;
             margin: 0;
-            transition: background-color 0.3s, color 0.3s; /* Płynne przejście */
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             width: 100%;
@@ -70,72 +69,110 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
-        button.logout-btn { background-color: #757575; margin-top: 20px; }
+        button.nav-btn { background-color: #1976D2; }
+        button.sec-btn { background-color: #388E3C; }
+        button.grey-btn { background-color: #757575; }
+        button.logout-btn { background-color: #555555; margin-top: 20px; }
+        
         #message { margin-top: 15px; font-weight: bold; }
         
+        /* Zarządzanie ekranami SPA */
         .ekran { display: none; }
         .aktywny { display: block; }
 
+        /* Kafelki meczów */
         .kafelek-wydarzenia {
             background-color: var(--card-bg);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
             text-align: left;
             border-left: 5px solid #388E3C;
         }
         .kafelek-tytul { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #1976D2;}
-        .kafelek-detale { font-size: 14px; margin-bottom: 3px; color: var(--text-color); opacity: 0.8;}
+        .kafelek-detale { font-size: 14px; margin-bottom: 4px; color: var(--text-color); opacity: 0.9;}
         .kafelek-badge { 
             display: inline-block; 
             background-color: var(--border-color); 
             color: var(--text-color);
-            padding: 3px 8px; 
+            padding: 4px 10px; 
             border-radius: 12px; 
             font-size: 12px; 
             margin-top: 5px;
             font-weight: bold;
         }
         
-        /* Tło dla szczegółów */
-        #szczegolyTresc {
+        .box-tresc {
             background-color: var(--card-bg);
             color: var(--text-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1 style="color: #F57C00;">SiatkaPiwo</h1>
+        <h1 style="color: #F57C00; margin-bottom: 25px;">SiatkaPiwo</h1>
 
-<div id="ekranLogowania" class="ekran">
-    <p>Zaloguj się do systemu</p>
-    <input type="text" id="login" placeholder="Twój login">
-    <input type="password" id="haslo" placeholder="Twoje hasło">
-    <button onclick="zaloguj()">ZALOGUJ SIĘ</button>
-    <div id="message"></div>
-</div>
+        <div id="ekranLogowania" class="ekran">
+            <p>Zaloguj się do systemu</p>
+            <input type="text" id="login" placeholder="Twój login">
+            <input type="password" id="haslo" placeholder="Twoje hasło">
+            <button onclick="zaloguj()">ZALOGUJ SIĘ</button>
+            <div id="message"></div>
+        </div>
 
-<div id="ekranGlowny" class="ekran">
-    <picture>
-        <source srcset="logo.png" media="(prefers-color-scheme: dark)">
-        <img src="logo_white.png" alt="SiatkaPiwo Logo" style="width: 130px; height: auto; margin: 0 auto 15px auto; display: block;">
-    </picture>
-    <h2 id="powitanieUsera">Cześć!</h2>
-    
-    <div id="listaWydarzen">
-        <p>Ładowanie wydarzeń...</p>
+        <div id="ekranGlowny" class="ekran">
+            <picture>
+                <source srcset="logo1.png" media="(prefers-color-scheme: dark)">
+                <img src="logo_white.png" alt="SiatkaPiwo Logo" style="width: 130px; height: auto; margin: 0 auto 15px auto; display: block;">
+            </picture>
+            
+            <h2 id="powitanieUsera" style="margin-bottom: 25px;">Cześć!</h2>
+            
+            <button class="nav-btn" onclick="otworzListeWydarzen()">📅 LISTA MECZÓW</button>
+            <button class="sec-btn" onclick="alert('Rozliczenia pojawią się wkrótce!')">💰 MOJE ROZLICZENIA</button>
+            <button class="grey-btn" onclick="otworzEdycjeProfilu()">⚙ EDYCJA PROFILU</button>
+            
+            <button class="logout-btn" onclick="wyloguj()">WYLOGUJ SIĘ</button>
+        </div>
+
+        <div id="ekranListaWydarzen" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 40px;">⬅ Menu Główne</button>
+            <h2>Dostępne mecze</h2>
+            <div id="listaWydarzen">
+                <p>Ładowanie wydarzeń...</p>
+            </div>
+        </div>
+
+        <div id="ekranSzczegolow" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranListaWydarzen')" style="height: 40px; margin-bottom: 20px;">⬅ Wróć do listy</button>
+            <div id="szczegolyTresc" class="box-tresc"></div>
+            <button id="btnZapiszSie" onclick="obsluzZapis()" style="margin-top: 20px;"></button>
+        </div>
+
+        <div id="ekranProfilu" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 40px; margin-bottom: 20px;">⬅ Menu Główne</button>
+            <h2>Edycja Profilu</h2>
+            <div class="box-tresc">
+                <label><b>Imię i Nazwisko:</b></label>
+                <input type="text" id="profImie" style="margin-top: 5px;" readonly>
+                <label><b>ID Użytkownika:</b></label>
+                <input type="text" id="profId" style="margin-top: 5px;" readonly>
+                <p style="font-size: 13px; color: gray; text-align: center;">Zmiana danych profilowych z poziomu WWW będzie dostępna w wersji V1.1.</p>
+            </div>
+        </div>
+
     </div>
-    <button class="logout-btn" onclick="wyloguj()">WYLOGUJ SIĘ</button>
-</div>
 
-    </div>
-
- <script>
+    <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwBiHv4GuJJwbpV-L8O5oXe-cdK7W0nlGnVG8DC1MDHVNBW4au2nt_W65Ab12S_G00I/exec";
 
         let aktualneWydarzenieId = null;
@@ -146,8 +183,7 @@
             const msgBuffer = new TextEncoder().encode(haslo);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         window.onload = function() {
@@ -161,17 +197,20 @@
             if (mojeId && mojeImie) {
                 document.getElementById('powitanieUsera').innerText = "Cześć, " + mojeImie + "!";
                 pokazEkran('ekranGlowny');
-                pobierzWydarzenia(mojeId);
             } else {
                 pokazEkran('ekranLogowania');
             }
         }
 
+        // Całkowicie bezpieczna funkcja przełączania ekranów (nie wywala skryptu gdy czegoś brak)
         function pokazEkran(idEkranu) {
-            document.getElementById('ekranLogowania').classList.remove('aktywny');
-            document.getElementById('ekranGlowny').classList.remove('aktywny');
-            document.getElementById('ekranSzczegolow').classList.remove('aktywny');
-            document.getElementById(idEkranu).classList.add('aktywny');
+            const ekrany = ['ekranLogowania', 'ekranGlowny', 'ekranListaWydarzen', 'ekranSzczegolow', 'ekranProfilu'];
+            ekrany.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('aktywny');
+            });
+            const aktywnyEl = document.getElementById(idEkranu);
+            if (aktywnyEl) aktywnyEl.classList.add('aktywny');
         }
 
         async function zaloguj() {
@@ -185,7 +224,7 @@
                 return;
             }
 
-            msgDiv.style.color = "black";
+            msgDiv.style.color = "var(--text-color)";
             msgDiv.innerText = "Logowanie...";
 
             try {
@@ -211,14 +250,26 @@
                 });
             } catch (err) {
                 msgDiv.style.color = "red";
-                msgDiv.innerText = "Błąd wewnętrzny kryptografii.";
+                msgDiv.innerText = "Błąd kryptografii.";
             }
         }
 
         function wyloguj() {
             localStorage.clear();
-            document.getElementById('message').innerText = "";
+            if(document.getElementById('message')) document.getElementById('message').innerText = "";
             sprawdzSesje();
+        }
+
+        function otworzListeWydarzen() {
+            pokazEkran('ekranListaWydarzen');
+            const mojeId = localStorage.getItem('mojeId');
+            pobierzWydarzenia(mojeId);
+        }
+
+        function otworzEdycjeProfilu() {
+            document.getElementById('profImie').value = localStorage.getItem('mojeImie') || "";
+            document.getElementById('profId').value = localStorage.getItem('mojeId') || "";
+            pokazEkran('ekranProfilu');
         }
 
         function pobierzWydarzenia(idUzytkownika) {
@@ -339,12 +390,11 @@
                         trescDiv.innerHTML = `<p style="color: red;">Błąd: ${data.message}</p>`;
                     }
                 } catch(e) {
-                    console.error("Błąd podczas renderowania:", e);
+                    console.error(e);
                     trescDiv.innerHTML = `<p style="color: red;">Wystąpił błąd wyświetlania danych.</p>`;
                 }
             })
             .catch(err => {
-                console.error("Błąd sieci:", err);
                 trescDiv.innerHTML = `<p style="color: red;">Błąd połączenia z serwerem.</p>`;
             });
         }
