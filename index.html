@@ -135,11 +135,13 @@
 
     </div>
 
-    <script>
+ <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwBiHv4GuJJwbpV-L8O5oXe-cdK7W0nlGnVG8DC1MDHVNBW4au2nt_W65Ab12S_G00I/exec";
 
-        // NOWOŚĆ: Funkcja do hashowania hasła w JavaScript (SHA-256)
-        // Musi generować identyczny wynik jak funkcja w Kotlinie na telefonie
+        let aktualneWydarzenieId = null;
+        let czyJestemZapisany = false;
+        let jestemOrganizatorem = false;
+
         async function hashujHaslo(haslo) {
             const msgBuffer = new TextEncoder().encode(haslo);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -168,10 +170,10 @@
         function pokazEkran(idEkranu) {
             document.getElementById('ekranLogowania').classList.remove('aktywny');
             document.getElementById('ekranGlowny').classList.remove('aktywny');
+            document.getElementById('ekranSzczegolow').classList.remove('aktywny');
             document.getElementById(idEkranu).classList.add('aktywny');
         }
 
-        // ZMIANA: Dodajemy słowo 'async', bo musimy poczekać na wygenerowanie hasha
         async function zaloguj() {
             const login = document.getElementById('login').value;
             const haslo = document.getElementById('haslo').value;
@@ -187,19 +189,10 @@
             msgDiv.innerText = "Logowanie...";
 
             try {
-                // NOWOŚĆ: Hashujemy hasło w przeglądarce przed spakowaniem do JSONa
                 const zahashowaneHaslo = await hashujHaslo(haslo);
+                const payload = { action: "logowanie", login: login, haslo: zahashowaneHaslo };
 
-                const payload = { 
-                    action: "logowanie", 
-                    login: login, 
-                    haslo: zahashowaneHaslo // Wysyłamy bezpieczny hash
-                };
-
-                fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                })
+                fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
                 .then(response => response.json())
                 .then(data => {
                     if(data.status === "success") {
@@ -216,11 +209,9 @@
                     msgDiv.style.color = "red";
                     msgDiv.innerText = "Błąd połączenia z serwerem.";
                 });
-
             } catch (err) {
                 msgDiv.style.color = "red";
                 msgDiv.innerText = "Błąd wewnętrzny kryptografii.";
-                console.error(err);
             }
         }
 
@@ -236,10 +227,7 @@
 
             const payload = { action: "get_all_events_extended", id_uzytkownika: idUzytkownika };
 
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            })
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
             .then(response => response.json())
             .then(data => {
                 if(data.status === "success") {
@@ -253,14 +241,11 @@
             });
         }
 
-        let aktualneWydarzenieId = null;
-        let czyJestemZapisany = false;
-
         function wyrenderujKafelki(wydarzenia) {
             const listaDiv = document.getElementById('listaWydarzen');
             listaDiv.innerHTML = "";
 
-            if(wydarzenia.length === 0) {
+            if(!wydarzenia || wydarzenia.length === 0) {
                 listaDiv.innerHTML = "<p>Brak zaplanowanych wydarzeń.</p>";
                 return;
             }
@@ -270,7 +255,6 @@
                 const borderKolor = wyd.status === "Zakończone" ? "#9E9E9E" : "#388E3C";
                 const czyZapisanyTekst = wyd.czy_zapisany ? "<span style='color:#388E3C;'>Zapisany</span>" : "Brak zapisu";
 
-                // Dodany atrybut onclick do całego kafelka
                 const htmlKafelka = `
                     <div class="kafelek-wydarzenia" style="border-left-color: ${borderKolor}; cursor: pointer;" onclick="otworzSzczegoly('${wyd.id_wydarzenia}')">
                         <div class="kafelek-tytul">${wyd.nazwa}</div>
@@ -285,7 +269,7 @@
             });
         }
 
-function otworzSzczegoly(idWydarzenia) {
+        function otworzSzczegoly(idWydarzenia) {
             aktualneWydarzenieId = idWydarzenia;
             const mojeId = localStorage.getItem('mojeId');
             const trescDiv = document.getElementById('szczegolyTresc');
@@ -304,37 +288,52 @@ function otworzSzczegoly(idWydarzenia) {
                     if(data.status === "success") {
                         const r = data.raw_data || {};
                         czyJestemZapisany = data.czy_zapisany;
+                        jestemOrganizatorem = data.czy_organizator;
                         
-                        // BEZPIECZNE łączenie listy - jeśli nie ma uczestników, daj pustą tablicę
-                        const listaZapisanych = (data.uczestnicy && data.uczestnicy.length > 0) 
-                            ? data.uczestnicy.join('\n') 
+                        const kosztNum = parseFloat(r.koszt.replace(",", ".")) || 0.0;
+                        const uczestnicyArray = data.uczestnicy || [];
+                        let wszystkichAktywnych = 0;
+                        
+                        uczestnicyArray.forEach(p => {
+                            if (!p.startsWith("Rezerwa")) wszystkichAktywnych++;
+                        });
+
+                        let aktualnyKosztZaOsobe = kosztNum;
+                        const czyCenaDynamiczna = r.typ_ceny.toLowerCase().includes("alość") || r.typ_ceny.toLowerCase().includes("alosc");
+                        
+                        if (czyCenaDynamiczna && wszystkichAktywnych > 0) {
+                            aktualnyKosztZaOsobe = Math.ceil((kosztNum / wszystkichAktywnych) * 2) / 2.0;
+                        }
+
+                        const listaZapisanych = (uczestnicyArray.length > 0) 
+                            ? uczestnicyArray.join('\n') 
                             : "Brak zapisanych graczy";
                         
                         trescDiv.innerHTML = `
                             <h2 style="color: #1976D2; margin-top: 0;">${r.nazwa || "Brak nazwy"}</h2>
-                            <p><strong>Miejsce:</strong> ${r.miejsce || "Nieznane"}</p>
-                            <p><strong>Data:</strong> ${r.data || "Brak"}</p>
-                            <p><strong>Organizator:</strong> ${data.organizator || "Nieznany"}</p>
-                            <p><strong>Status:</strong> ${data.status_wydarzenia || "Aktywne"}</p>
-                            <hr style="border-color: var(--border-color);">
-                            <h3>Lista graczy:</h3>
-                            <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.5;">${listaZapisanych}</p>
+                            <p>📍 <strong>Miejsce:</strong> ${r.miejsce || "Nieznane"}</p>
+                            <p>📅 <strong>Data:</strong> ${r.data || "Brak"}</p>
+                            <p>👤 <strong>Organizator:</strong> ${data.organizator || "Nieznany"}</p>
+                            ${data.telefon_organizatora ? `<p>📞 <strong>BLIK:</strong> ${data.telefon_organizatora}</p>` : ''}
+                            <p>💰 <strong>Koszt:</strong> ${r.typ_ceny} (${aktualnyKosztZaOsobe.toFixed(2)} zł / os.)</p>
+                            <p>📝 <strong>Uwagi:</strong> ${r.uwagi || 'Brak'}</p>
+                            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+                            <div id="rachunekWeb" style="padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;"></div>
+                            <h3>Lista graczy (${uczestnicyArray.length}):</h3>
+                            <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; background: var(--bg-color); padding: 10px; border-radius: 8px;">${listaZapisanych}</p>
                         `;
+
+                        przeliczRachunekWeb(data, r.typ_ceny, aktualnyKosztZaOsobe);
 
                         btnZapisz.style.display = "block";
                         if (data.status_wydarzenia === "Zakończone") {
                             btnZapisz.innerText = "MECZ ZAKOŃCZONY";
-                            btnZapisz.style.backgroundColor = "#9E9E9E";
+                            btnZapisz.style.backgroundColor = "#757575";
                             btnZapisz.disabled = true;
                         } else {
                             btnZapisz.disabled = false;
-                            if (czyJestemZapisany) {
-                                btnZapisz.innerText = "WYPISZ SIĘ";
-                                btnZapisz.style.backgroundColor = "#D32F2F";
-                            } else {
-                                btnZapisz.innerText = "ZAPISZ SIĘ";
-                                btnZapisz.style.backgroundColor = "#388E3C";
-                            }
+                            btnZapisz.innerText = czyJestemZapisany ? "WYPISZ SIĘ" : "ZAPISZ SIĘ";
+                            btnZapisz.style.backgroundColor = czyJestemZapisany ? "#D32F2F" : "#388E3C";
                         }
                     } else {
                         trescDiv.innerHTML = `<p style="color: red;">Błąd: ${data.message}</p>`;
@@ -348,6 +347,49 @@ function otworzSzczegoly(idWydarzenia) {
                 console.error("Błąd sieci:", err);
                 trescDiv.innerHTML = `<p style="color: red;">Błąd połączenia z serwerem.</p>`;
             });
+        }
+
+        function przeliczRachunekWeb(data, typCeny, kosztOsobowy) {
+            const div = document.getElementById('rachunekWeb');
+            const czyDarmowe = (typCeny === "Darmowe" || kosztOsobowy <= 0);
+            
+            if (data.czy_organizator) {
+                if (czyDarmowe) {
+                    div.innerHTML = "Wydarzenie darmowe";
+                    div.style.color = "#388E3C";
+                    return;
+                }
+                const doZebrania = data.ilu_innych_aktywnych * kosztOsobowy;
+                const zebrano = data.ilu_innych_oplaconych * kosztOsobowy;
+                div.innerHTML = `Jesteś organizatorem.<br>Zbiórka: ${zebrano.toFixed(2)} zł z ${doZebrania.toFixed(2)} zł`;
+                div.style.color = (zebrano >= doZebrania && doZebrania > 0) ? "#388E3C" : "#1976D2";
+            } else {
+                const liczbaMoichBiletow = (data.czy_zapisany ? 1 : 0) + (data.moi_goscie ? data.moi_goscie.length : 0);
+                
+                if (liczbaMoichBiletow === 0) {
+                    div.innerHTML = "Nie grasz w tym meczu";
+                    div.style.color = "gray";
+                    return;
+                }
+
+                if (czyDarmowe) {
+                    div.innerHTML = "Koszt: 0.00 zł (Darmowe)";
+                    div.style.color = "#388E3C";
+                    return;
+                }
+
+                const mojeAktywne = (data.czy_ja_aktywny ? 1 : 0) + (data.ilu_moich_aktywnych_gosci || 0);
+                const calkowityKoszt = mojeAktywne * kosztOsobowy;
+                
+                const wplacone = ( (data.moj_status_zaplacil ? 1 : 0) + (data.ile_moich_gosci_zaplacilo || 0) ) * kosztOsobowy;
+                const doZaplaty = calkowityKoszt - wplacone;
+
+                let tekst = `Do zapłaty: ${doZaplaty.toFixed(2)} zł`;
+                if (wplacone > 0) tekst += `<br><small>(Wpłacono już: ${wplacone.toFixed(2)} zł)</small>`;
+                
+                div.innerHTML = tekst;
+                div.style.color = doZaplaty <= 0 ? "#388E3C" : "#D32F2F";
+            }
         }
 
         function obsluzZapis() {
@@ -364,13 +406,10 @@ function otworzSzczegoly(idWydarzenia) {
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
             .then(res => res.json())
             .then(data => {
-                // Po udanej akcji odświeżamy dane widoku
                 otworzSzczegoly(aktualneWydarzenieId);
             });
         }
-    </script>
-	<script>
-        // Rejestracja Service Workera dla PWA
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
