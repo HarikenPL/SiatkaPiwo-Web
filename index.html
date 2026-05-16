@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiatkaPiwo</title>
+	<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F57C00">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SiatkaPiwo">
+    
+    <style>
+        /* ZMIENNE KOLORYSTYCZNE - DOMYŚLNIE JASNY MOTYW */
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --border-color: #cccccc;
+            --input-bg: #ffffff;
+        }
+
+        /* JEŚLI SYSTEM JEST W TRYBIE CIEMNYM - PODMIENIAMY KOLORY */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --card-bg: #1e1e1e;
+                --border-color: #333333;
+                --input-bg: #2c2c2c;
+            }
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s; /* Płynne przejście */
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            height: 50px;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+        }
+        button {
+            width: 100%;
+            height: 55px;
+            background-color: #F57C00;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        button.logout-btn { background-color: #757575; margin-top: 20px; }
+        #message { margin-top: 15px; font-weight: bold; }
+        
+        .ekran { display: none; }
+        .aktywny { display: block; }
+
+        .kafelek-wydarzenia {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            text-align: left;
+            border-left: 5px solid #388E3C;
+        }
+        .kafelek-tytul { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #1976D2;}
+        .kafelek-detale { font-size: 14px; margin-bottom: 3px; color: var(--text-color); opacity: 0.8;}
+        .kafelek-badge { 
+            display: inline-block; 
+            background-color: var(--border-color); 
+            color: var(--text-color);
+            padding: 3px 8px; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        /* Tło dla szczegółów */
+        #szczegolyTresc {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 style="color: #F57C00;">SiatkaPiwo</h1>
+
+<div id="ekranLogowania" class="ekran">
+    <p>Zaloguj się do systemu</p>
+    <input type="text" id="login" placeholder="Twój login">
+    <input type="password" id="haslo" placeholder="Twoje hasło">
+    <button onclick="zaloguj()">ZALOGUJ SIĘ</button>
+    <div id="message"></div>
+</div>
+
+<div id="ekranGlowny" class="ekran">
+    <picture>
+        <source srcset="logo.png" media="(prefers-color-scheme: dark)">
+        <img src="logo_white.png" alt="SiatkaPiwo Logo" style="width: 130px; height: auto; margin: 0 auto 15px auto; display: block;">
+    </picture>
+    <h2 id="powitanieUsera">Cześć!</h2>
+    
+    <div id="listaWydarzen">
+        <p>Ładowanie wydarzeń...</p>
+    </div>
+    <button class="logout-btn" onclick="wyloguj()">WYLOGUJ SIĘ</button>
+</div>
+
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwBiHv4GuJJwbpV-L8O5oXe-cdK7W0nlGnVG8DC1MDHVNBW4au2nt_W65Ab12S_G00I/exec";
+
+        // NOWOŚĆ: Funkcja do hashowania hasła w JavaScript (SHA-256)
+        // Musi generować identyczny wynik jak funkcja w Kotlinie na telefonie
+        async function hashujHaslo(haslo) {
+            const msgBuffer = new TextEncoder().encode(haslo);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        window.onload = function() {
+            sprawdzSesje();
+        };
+
+        function sprawdzSesje() {
+            const mojeId = localStorage.getItem('mojeId');
+            const mojeImie = localStorage.getItem('mojeImie');
+
+            if (mojeId && mojeImie) {
+                document.getElementById('powitanieUsera').innerText = "Cześć, " + mojeImie + "!";
+                pokazEkran('ekranGlowny');
+                pobierzWydarzenia(mojeId);
+            } else {
+                pokazEkran('ekranLogowania');
+            }
+        }
+
+        function pokazEkran(idEkranu) {
+            document.getElementById('ekranLogowania').classList.remove('aktywny');
+            document.getElementById('ekranGlowny').classList.remove('aktywny');
+            document.getElementById(idEkranu).classList.add('aktywny');
+        }
+
+        // ZMIANA: Dodajemy słowo 'async', bo musimy poczekać na wygenerowanie hasha
+        async function zaloguj() {
+            const login = document.getElementById('login').value;
+            const haslo = document.getElementById('haslo').value;
+            const msgDiv = document.getElementById('message');
+
+            if(!login || !haslo) {
+                msgDiv.style.color = "red";
+                msgDiv.innerText = "Podaj login i hasło!";
+                return;
+            }
+
+            msgDiv.style.color = "black";
+            msgDiv.innerText = "Logowanie...";
+
+            try {
+                // NOWOŚĆ: Hashujemy hasło w przeglądarce przed spakowaniem do JSONa
+                const zahashowaneHaslo = await hashujHaslo(haslo);
+
+                const payload = { 
+                    action: "logowanie", 
+                    login: login, 
+                    haslo: zahashowaneHaslo // Wysyłamy bezpieczny hash
+                };
+
+                fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === "success") {
+                        localStorage.setItem('mojeId', data.id);
+                        localStorage.setItem('mojeImie', data.imie);
+                        sprawdzSesje(); 
+                        document.getElementById('haslo').value = ""; 
+                    } else {
+                        msgDiv.style.color = "red";
+                        msgDiv.innerText = "Błąd: " + data.message;
+                    }
+                })
+                .catch(error => {
+                    msgDiv.style.color = "red";
+                    msgDiv.innerText = "Błąd połączenia z serwerem.";
+                });
+
+            } catch (err) {
+                msgDiv.style.color = "red";
+                msgDiv.innerText = "Błąd wewnętrzny kryptografii.";
+                console.error(err);
+            }
+        }
+
+        function wyloguj() {
+            localStorage.clear();
+            document.getElementById('message').innerText = "";
+            sprawdzSesje();
+        }
+
+        function pobierzWydarzenia(idUzytkownika) {
+            const listaDiv = document.getElementById('listaWydarzen');
+            listaDiv.innerHTML = "<p>Ładowanie wydarzeń...</p>";
+
+            const payload = { action: "get_all_events_extended", id_uzytkownika: idUzytkownika };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    wyrenderujKafelki(data.wydarzenia);
+                } else {
+                    listaDiv.innerHTML = "<p style='color:red;'>Błąd pobierania danych.</p>";
+                }
+            })
+            .catch(error => {
+                listaDiv.innerHTML = "<p style='color:red;'>Błąd połączenia.</p>";
+            });
+        }
+
+        let aktualneWydarzenieId = null;
+        let czyJestemZapisany = false;
+
+        function wyrenderujKafelki(wydarzenia) {
+            const listaDiv = document.getElementById('listaWydarzen');
+            listaDiv.innerHTML = "";
+
+            if(wydarzenia.length === 0) {
+                listaDiv.innerHTML = "<p>Brak zaplanowanych wydarzeń.</p>";
+                return;
+            }
+
+            wydarzenia.forEach(wyd => {
+                const limitTekst = wyd.limit > 0 ? wyd.limit : "Bez limitu";
+                const borderKolor = wyd.status === "Zakończone" ? "#9E9E9E" : "#388E3C";
+                const czyZapisanyTekst = wyd.czy_zapisany ? "<span style='color:#388E3C;'>Zapisany</span>" : "Brak zapisu";
+
+                // Dodany atrybut onclick do całego kafelka
+                const htmlKafelka = `
+                    <div class="kafelek-wydarzenia" style="border-left-color: ${borderKolor}; cursor: pointer;" onclick="otworzSzczegoly('${wyd.id_wydarzenia}')">
+                        <div class="kafelek-tytul">${wyd.nazwa}</div>
+                        <div class="kafelek-detale">📅 ${wyd.data}</div>
+                        <div class="kafelek-detale">📍 ${wyd.miejsce}</div>
+                        
+                        <div class="kafelek-badge">Zapisanych: ${wyd.zapisanych} / ${limitTekst}</div>
+                        <div class="kafelek-badge">${czyZapisanyTekst}</div>
+                    </div>
+                `;
+                listaDiv.innerHTML += htmlKafelka;
+            });
+        }
+
+function otworzSzczegoly(idWydarzenia) {
+            aktualneWydarzenieId = idWydarzenia;
+            const mojeId = localStorage.getItem('mojeId');
+            const trescDiv = document.getElementById('szczegolyTresc');
+            const btnZapisz = document.getElementById('btnZapiszSie');
+            
+            trescDiv.innerHTML = "<p>Ładowanie szczegółów...</p>";
+            btnZapisz.style.display = "none";
+            pokazEkran('ekranSzczegolow');
+
+            const payload = { action: "get_event_details", id_wydarzenia: idWydarzenia, id_uzytkownika: mojeId };
+
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                try {
+                    if(data.status === "success") {
+                        const r = data.raw_data || {};
+                        czyJestemZapisany = data.czy_zapisany;
+                        
+                        // BEZPIECZNE łączenie listy - jeśli nie ma uczestników, daj pustą tablicę
+                        const listaZapisanych = (data.uczestnicy && data.uczestnicy.length > 0) 
+                            ? data.uczestnicy.join('\n') 
+                            : "Brak zapisanych graczy";
+                        
+                        trescDiv.innerHTML = `
+                            <h2 style="color: #1976D2; margin-top: 0;">${r.nazwa || "Brak nazwy"}</h2>
+                            <p><strong>Miejsce:</strong> ${r.miejsce || "Nieznane"}</p>
+                            <p><strong>Data:</strong> ${r.data || "Brak"}</p>
+                            <p><strong>Organizator:</strong> ${data.organizator || "Nieznany"}</p>
+                            <p><strong>Status:</strong> ${data.status_wydarzenia || "Aktywne"}</p>
+                            <hr style="border-color: var(--border-color);">
+                            <h3>Lista graczy:</h3>
+                            <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.5;">${listaZapisanych}</p>
+                        `;
+
+                        btnZapisz.style.display = "block";
+                        if (data.status_wydarzenia === "Zakończone") {
+                            btnZapisz.innerText = "MECZ ZAKOŃCZONY";
+                            btnZapisz.style.backgroundColor = "#9E9E9E";
+                            btnZapisz.disabled = true;
+                        } else {
+                            btnZapisz.disabled = false;
+                            if (czyJestemZapisany) {
+                                btnZapisz.innerText = "WYPISZ SIĘ";
+                                btnZapisz.style.backgroundColor = "#D32F2F";
+                            } else {
+                                btnZapisz.innerText = "ZAPISZ SIĘ";
+                                btnZapisz.style.backgroundColor = "#388E3C";
+                            }
+                        }
+                    } else {
+                        trescDiv.innerHTML = `<p style="color: red;">Błąd: ${data.message}</p>`;
+                    }
+                } catch(e) {
+                    console.error("Błąd podczas renderowania:", e);
+                    trescDiv.innerHTML = `<p style="color: red;">Wystąpił błąd wyświetlania danych.</p>`;
+                }
+            })
+            .catch(err => {
+                console.error("Błąd sieci:", err);
+                trescDiv.innerHTML = `<p style="color: red;">Błąd połączenia z serwerem.</p>`;
+            });
+        }
+
+        function obsluzZapis() {
+            const mojeId = localStorage.getItem('mojeId');
+            const mojeImie = localStorage.getItem('mojeImie');
+            const akcja = czyJestemZapisany ? "leave_event" : "join_event";
+            const btnZapisz = document.getElementById('btnZapiszSie');
+            
+            btnZapisz.innerText = "Przetwarzanie...";
+            btnZapisz.disabled = true;
+
+            const payload = { action: akcja, id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId, imie: mojeImie };
+
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                // Po udanej akcji odświeżamy dane widoku
+                otworzSzczegoly(aktualneWydarzenieId);
+            });
+        }
+    </script>
+	<script>
+        // Rejestracja Service Workera dla PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker zarejestrowany.', reg))
+                    .catch((err) => console.log('Błąd rejestracji Service Workera.', err));
+            });
+        }
+    </script>
+</body>
+</html>
