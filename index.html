@@ -2,13 +2,15 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SiatkaPiwo</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SiatkaPiwo">
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="logo1.png">
+    <link rel="apple-touch-icon" href="logo1.png">
     <meta name="theme-color" content="#F57C00">
     
     <style>
@@ -21,47 +23,71 @@
                 --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e;
                 --border-color: #333333; --input-bg: #2c2c2c; --box-bg: #181818; --menu-bg: #2c2c2c;
             }
+            .dynamic-logo { content: url('logo.png'); }
         }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 0; margin: 0; min-height: 100vh; }
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; position: relative; }
+        @media (prefers-color-scheme: light) {
+            .dynamic-logo { content: url('logo_white.png'); }
+        }
+        
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 0; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; position: relative; margin: 0 auto; }
+        
         input, select, textarea { width: 100%; height: 50px; margin-bottom: 15px; padding: 10px; font-size: 16px; box-sizing: border-box; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); border-radius: 8px; font-family: inherit; }
         textarea { height: 80px; resize: none; }
         .checkbox-container { display: flex; align-items: center; margin-bottom: 15px; font-size: 14px; }
         .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; margin: 0 10px 0 0; }
+        
         button { width: 100%; height: 55px; background-color: #F57C00; color: white; font-size: 15px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
         button.nav-btn { background-color: #1976D2; }
         button.sec-btn { background-color: #388E3C; }
         button.grey-btn { background-color: #757575; }
-        button.purple-btn { background-color: #9C27B0; }
         button.red-btn { background-color: #D32F2F; }
         button.black-btn { background-color: #000000; color: white; }
         button.text-btn { background-color: transparent; color: #1976D2; height: auto; text-transform: none; text-decoration: underline; margin-top: 5px; }
+        
         .ekran { display: none; }
         .aktywny { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
         .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; }
-        .logo-container { flex-grow: 1; display: flex; justify-content: center; }
+        .logo-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; }
+        .dynamic-logo { max-height: 40px; width: auto; }
         .action-icons { display: flex; gap: 15px; align-items: center; }
         .icon-btn { font-size: 26px; cursor: pointer; user-select: none; }
+        
         .dropdown-menu { display: none; position: absolute; top: 40px; right: 0; background-color: var(--menu-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; width: 180px; }
         .dropdown-menu.pokaz { display: block; }
         .dropdown-item { padding: 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; text-align: left; font-size: 14px; font-weight: bold; }
-        .dropdown-item:hover { opacity: 0.8; }
+        
         .kafelek-wydarzenia { background-color: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); border-left: 5px solid #388E3C; cursor: pointer; }
         .kafelek-tytul { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #1976D2;}
         .kafelek-detale { font-size: 14px; margin-bottom: 4px; opacity: 0.9;}
         .kafelek-badge { display: inline-block; background-color: var(--border-color); color: var(--text-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-top: 5px; font-weight: bold;}
+        
         .box-tresc { background-color: var(--card-bg); padding: 20px; border-radius: 12px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .box-lista { background-color: var(--box-bg); padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border-color); }
         .flex-row { display: flex; justify-content: space-between; align-items: center; }
+        
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 18px; font-weight: bold; text-align: center; padding: 20px; box-sizing: border-box; }
         .spinner { border: 6px solid #f3f3f3; border-top: 6px solid #F57C00; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Modal do zdjęcia */
+        .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); justify-content: center; align-items: center; flex-direction: column; }
+        .modal-content { max-width: 90%; max-height: 70vh; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        .modal-caption { color: #ddd; margin-top: 15px; text-align: center; font-size: 14px; padding: 0 20px; max-width: 400px; line-height: 1.5; }
+        .close-modal { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div id="loadingOverlay"><div class="spinner"></div><div id="loadingText">Przetwarzanie...</div></div>
+
+    <div id="zdjecieModal" class="modal">
+        <span class="close-modal" onclick="zamknijZdjecie()">&times;</span>
+        <img class="modal-content" id="powiekszoneZdjecie" src="autor.jpg">
+        <div class="modal-caption">Zdjęcie pamiątkowe z dnia 8 kwietnia 2026 roku autorstwa Bartosza Błaszczyka.</div>
+    </div>
 
     <div class="container" id="mainContainer">
         
@@ -88,11 +114,11 @@
             <input type="text" id="rejPseudo" placeholder="Pseudonim">
             <select id="rejPozycja">
                 <option value="">Wybierz pozycję...</option>
-                <option value="S">S (Rozgrywający)</option>
-                <option value="OH">OH (Przyjmujący)</option>
-                <option value="MB">MB (Środkowy)</option>
-                <option value="OP">OP (Atakujący)</option>
-                <option value="L">L (Libero)</option>
+                <option value="S (Rozgrywający)">S (Rozgrywający)</option>
+                <option value="OH (Przyjmujący)">OH (Przyjmujący)</option>
+                <option value="MB (Środkowy)">MB (Środkowy)</option>
+                <option value="OP (Atakujący)">OP (Atakujący)</option>
+                <option value="L (Libero)">L (Libero)</option>
             </select>
             <input type="number" id="rejTelefon" placeholder="Nr telefonu do BLIK (np. 123456789)" oninput="this.value=this.value.slice(0,9)">
             <input type="number" id="rejNumerek" placeholder="Ulubiony numerek (max 2 cyfry)" oninput="this.value=this.value.slice(0,2)">
@@ -106,7 +132,7 @@
             <div class="top-bar">
                 <div style="width: 50px;"></div>
                 <div class="logo-container">
-                    <h2 style="color: #F57C00; margin: 0;">SiatkaPiwo</h2>
+                    <div class="dynamic-logo"></div>
                 </div>
                 <div class="action-icons">
                     <div class="icon-btn" onclick="pokazEkran('ekranOAplikacji')">ℹ️</div>
@@ -125,10 +151,18 @@
 
         <div id="ekranOAplikacji" class="ekran">
             <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
-            <div class="box-tresc" style="text-align: center;">
-                <h3 style="color: #1976D2; margin-top: 0;">🏐 SiatkaPiwo 🍺</h3>
-                <p>Aplikacja do zarządzania listami zapisów i automatyzacji rozliczeń.</p>
-                <p style="font-size: 12px; color: gray;">Wersja Web 1.0 (Połączona z Twoim Apps Script)</p>
+            <div class="box-tresc" style="text-align: center; line-height: 1.6; font-size: 15px;">
+                <h3 style="color: #1976D2; margin-top: 0; margin-bottom: 5px;">🏐SiatkaPiwo🍺 v1.0</h3>
+                
+                <img src="autor.jpg" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #F57C00; margin: 15px auto; display: block; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2);" onclick="pokazZdjecie()" alt="Twórca">
+                
+                <p>Aplikacja do zarządzania listami zapisów do gry w siatkę (I NIE TYLKO!) oraz automatyzacji rozliczeń wewnątrz ekipy.</p>
+                <p>Twórca: <b>Łukasz Krystoń</b><br>Student EiT na wydziale AEiI Politechniki Śląskiej.</p>
+                <p style="background: #FFF8E1; padding: 10px; border-radius: 8px; border: 1px solid #FFECB3; font-size: 14px;">Jeśli podoba Ci się moja praca i ułatwiła Ci życie, możesz postawić mi symboliczne piwo BLIK-iem na numer:<br><b style="font-size: 18px; color: #F57C00;">721868448</b> 🍻</p>
+                
+                <p style="font-size: 13px; color: gray;">Wszelkie prawa zastrzeżone.</p>
+                <p style="font-size: 14px; margin-top: 20px;">Dziękuję za motywację! Dzięki wam powstała ta abominacja nazywana też aplikacją  💚</p>
+                
                 <button class="grey-btn" style="background-color: #F4B400; color: #000; margin-top: 15px;" onclick="window.open('https://drive.google.com/drive/folders/1JMywmWz9G6CYm2UswgerT-SBqCoGN6SX?usp=drive_link', '_blank')">📁 DYSK GOOGLE</button>
             </div>
         </div>
@@ -143,11 +177,11 @@
                 <label><b>Pozycja:</b></label>
                 <select id="profPozycja">
                     <option value="">Wybierz pozycję...</option>
-                    <option value="S">S (Rozgrywający)</option>
-                    <option value="OH">OH (Przyjmujący)</option>
-                    <option value="MB">MB (Środkowy)</option>
-                    <option value="OP">OP (Atakujący)</option>
-                    <option value="L">L (Libero)</option>
+                    <option value="S (Rozgrywający)">S (Rozgrywający)</option>
+                    <option value="OH (Przyjmujący)">OH (Przyjmujący)</option>
+                    <option value="MB (Środkowy)">MB (Środkowy)</option>
+                    <option value="OP (Atakujący)">OP (Atakujący)</option>
+                    <option value="L (Libero)">L (Libero)</option>
                 </select>
                 <label><b>Nr telefonu (BLIK):</b></label><input type="number" id="profTelefon" oninput="this.value=this.value.slice(0,9)">
                 <label><b>Ulubiony numerek:</b></label><input type="number" id="profNumerek" oninput="this.value=this.value.slice(0,2)">
@@ -155,7 +189,7 @@
 
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
                 
-                <button class="nav-btn" onclick="document.getElementById('sekcjaZmianyHasla').style.display='block'; this.style.display='none';">Zmień hasło</button>
+                <button id="btnZmienHaslo" class="nav-btn" onclick="document.getElementById('sekcjaZmianyHasla').style.display='block'; this.style.display='none';">Zmień hasło</button>
                 <div id="sekcjaZmianyHasla" style="display: none; background: var(--bg-color); padding: 15px; border-radius: 8px;">
                     <label><b>Stare hasło:</b></label><input type="password" id="profHasloStare">
                     <label><b>Nowe hasło:</b></label><input type="password" id="profHasloNowe">
@@ -164,7 +198,7 @@
 
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
 
-                <button class="red-btn" onclick="document.getElementById('sekcjaUsuwaniaKonta').style.display='block'; this.style.display='none';">Usuń konto</button>
+                <button id="btnUsunKonto" class="red-btn" onclick="document.getElementById('sekcjaUsuwaniaKonta').style.display='block'; this.style.display='none';">Usuń konto</button>
                 <div id="sekcjaUsuwaniaKonta" style="display: none; background: #ffebee; padding: 15px; border-radius: 8px;">
                     <label style="color: #D32F2F;"><b>Aktualne hasło (Wymagane do usunięcia):</b></label>
                     <input type="password" id="profHasloUsun">
@@ -250,10 +284,13 @@
             <button class="grey-btn" onclick="otworzSzczegoly(aktualneWydarzenieId)" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do szczegółów</button>
             <h2 style="text-align: center;">Moja Ekipa</h2>
             <div class="box-tresc">
-                <label><b>Dodaj gościa z bazy graczy:</b></label>
-                <div style="position: relative;">
-                    <input type="text" id="nazwaGoscia" placeholder="Wpisz minimum 2 litery imienia..." oninput="szukajGraczaDoEkipy(this.value)">
-                    <div id="podpowiedziGosci" class="dropdown-menu" style="width: 100%; top: 55px; max-height: 200px; overflow-y: auto;"></div>
+                <label><b>Dodaj gościa:</b></label>
+                <div style="position: relative; display: flex; gap: 10px; align-items: flex-start;">
+                    <div style="flex: 1; position: relative;">
+                        <input type="text" id="nazwaGoscia" placeholder="Wpisz imię..." oninput="szukajGraczaDoEkipy(this.value)" style="margin-bottom: 0;">
+                        <div id="podpowiedziGosci" class="dropdown-menu" style="width: 100%; top: 55px; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                    <button class="sec-btn" style="width: auto; padding: 0 15px; margin-bottom: 0; height: 50px;" onclick="dodajGraczaSpozaListy()">Dodaj</button>
                 </div>
             </div>
             <h3 style="margin-top: 20px;">Zapisani goście:</h3>
@@ -272,7 +309,7 @@
             <h3 style="margin-bottom: 10px;">Zarządzanie graczami:</h3>
             <div id="listaZarzadzaniaGraczami"></div>
             
-            <button class="sec-btn" style="margin-top: 15px;" onclick="rozliczWszystkieDlugi()">✅ ROZLICZ WSZYSTKIE DŁUGI DLA TEGO MECZU</button>
+            <button class="sec-btn" style="margin-top: 15px;" onclick="rozliczWszystkieDlugi()">✅ SYNCHRONIZUJ WPŁATY GOŚCI</button>
         </div>
 
     </div> <script>
@@ -320,6 +357,15 @@
             }
         }
     }
+
+    // Obsługa zdjęcia twórcy
+    function pokazZdjecie() {
+        document.getElementById('zdjecieModal').style.display = 'flex';
+    }
+
+    function zamknijZdjecie() {
+        document.getElementById('zdjecieModal').style.display = 'none';
+    }
 	
 	// Inicjalizacja przy wejściu na stronę
     window.onload = function() { 
@@ -349,7 +395,6 @@
         pokazLoading("Logowanie...");
         msgDiv.innerText = "";
 
-        // Hasło leci w oryginale - Apps Script zajmie się hashowaniem
         const payload = { action: "logowanie", login: login, haslo: haslo };
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -391,7 +436,7 @@
 
         pokazLoading("Tworzenie konta...");
         
-        // Generujemy unikalne ID zgodne z aplikacją mobilną
+        // Generujemy unikalne ID WEB_
         const noweId = "WEB_" + Date.now();
         
         const payload = { 
@@ -418,7 +463,6 @@
         const mojeId = localStorage.getItem('mojeId');
         pokazLoading("Pobieranie danych...");
         
-        // Zgodnie z Apps Script uderzamy po get_user_info ze zmienną 'id'
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_user_info", id: mojeId }) })
         .then(r => r.json()).then(data => {
             ukryjLoading();
@@ -433,10 +477,10 @@
                 document.getElementById('sekcjaZmianyHasla').style.display = 'none';
                 document.getElementById('sekcjaUsuwaniaKonta').style.display = 'none';
                 
-                const btns = document.getElementById('ekranProfilu').getElementsByTagName('button');
-                for(let i=0; i<btns.length; i++) {
-                    if(btns[i].innerText === 'Zmień hasło' || btns[i].innerText === 'Usuń konto') btns[i].style.display = 'block';
-                }
+                // Wymuszamy przywrócenie widoczności głównych przycisków
+                document.getElementById('btnZmienHaslo').style.display = 'block';
+                document.getElementById('btnUsunKonto').style.display = 'block';
+
                 pokazEkran('ekranProfilu');
             } else { alert("Błąd pobierania danych profilu."); }
         }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
@@ -477,7 +521,6 @@
         if(!stare || !nowe) { alert("Podaj obecne i nowe hasło!"); return; }
         pokazLoading("Zmiana hasła...");
         
-        // Używamy zmiennych 'stare_haslo' i 'nowe_haslo' - czysty tekst
         const payload = { action: "change_password", id: mojeId, stare_haslo: stare, nowe_haslo: nowe };
         
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -487,7 +530,10 @@
                 alert("Hasło zostało zmienione!");
                 document.getElementById('profHasloStare').value = "";
                 document.getElementById('profHasloNowe').value = "";
+                
+                // Chowamy pola zmiany i przywracamy błękitny przycisk
                 document.getElementById('sekcjaZmianyHasla').style.display = 'none';
+                document.getElementById('btnZmienHaslo').style.display = 'block';
             } else { alert("Błąd: " + data.message); }
         }).catch(e => { ukryjLoading(); alert("Błąd połączenia."); });
     }
@@ -500,7 +546,6 @@
             const mojeId = localStorage.getItem('mojeId');
             pokazLoading("Usuwanie konta...");
             
-            // Backend Apps Script oczekuje 'id' oraz 'haslo'
             const payload = { action: "delete_account", id: mojeId, haslo: hasloUsun };
             
             fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -608,7 +653,6 @@
                 let kosztNum = parseFloat((r.koszt || "0").toString().replace(",", ".")) || 0.0;
                 let aktualnyKoszt = kosztNum;
                 
-                // Dynamiczna cena za całość
                 const czyCenaDyn = ["ałość", "alość", "alosc"].some(s => (r.typ_ceny || "").toLowerCase().includes(s));
                 if (czyCenaDyn && aktywnych > 0) aktualnyKoszt = Math.ceil((kosztNum / aktywnych) * 2) / 2.0;
 
@@ -633,8 +677,15 @@
                 przeliczRachunekWeb(data, r.typ_ceny, aktualnyKoszt);
 
                 if(nrBlikOrganizatora) btnBlik.style.display = "block";
-                if(czyJestemZapisany || (data.moi_goscie && data.moi_goscie.length > 0)) btnZarzadzaj.style.display = "block";
-                if(data.czy_organizator) btnOrg.style.display = "block";
+                
+                // POPRAWKA: Ukrywamy "Moją Ekipę", jeśli jesteś organizatorem
+                if(!data.czy_organizator && (czyJestemZapisany || (data.moi_goscie && data.moi_goscie.length > 0))) {
+                    btnZarzadzaj.style.display = "block";
+                }
+                
+                if(data.czy_organizator) {
+                    btnOrg.style.display = "block";
+                }
 
                 btnZapisz.style.display = "block";
                 if (data.status_wydarzenia === "Zakończone") {
@@ -683,7 +734,6 @@
             const wkladDoPuli = mojeAktywne * kosztOsobowy;
             const wplaconeOrg = ((data.moj_status_zaplacil ? 1 : 0) + (data.ile_moich_gosci_zaplacilo || 0)) * kosztOsobowy;
             
-            // Liczymy gości, którzy zwrócili Ci pieniądze z podanej przez serwer tablicy
             let oddanePrzezGosci = 0;
             moiGoscie.forEach(g => { if(g.czy_zaplacil_mi) oddanePrzezGosci += kosztOsobowy; });
             
@@ -762,7 +812,7 @@
                 
                 document.getElementById('noweTypCeny').value = r.typ_ceny || "Darmowe";
                 document.getElementById('noweKosztDiv').style.display = (r.typ_ceny === 'Darmowe' ? 'none' : 'block');
-                document.getElementById('noweKoszt').value = r.koszt ? parseFloat(r.koszt.replace(",", ".")) : "0";
+                document.getElementById('noweKoszt').value = r.koszt ? parseFloat(String(r.koszt).replace(",", ".")) : "0";
                 document.getElementById('noweLimit').value = r.limit || "0";
                 document.getElementById('noweUwagi').value = r.uwagi || "";
                 
@@ -804,12 +854,11 @@
             uwagi: uwagi 
         };
 
-        // Zgodnie z analizą backendu: 
         if (idEdytowanego) {
             payload.id_wydarzenia = idEdytowanego;
-            payload.id_uzytkownika = mojeId; // Backend wymaga tego do weryfikacji uprawnień edycji
+            payload.id_uzytkownika = mojeId; 
         } else {
-            payload.organizator_id = mojeId; // Backend używa tego jako właściciela nowego meczu
+            payload.organizator_id = mojeId; 
         }
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
@@ -837,7 +886,7 @@
                 const wiszaMi = data.wisza_mi_zgrupowane || [];
                 const wiszeKomus = data.wisze_komus_zgrupowane || [];
                 
-                // Front-end musi samodzielnie zsumować łączną kwotę ze zgrupowanych obiektów
+                // Front-end sumuje łączną kwotę
                 let sumaMiWisza = 0;
                 wiszaMi.forEach(item => sumaMiWisza += parseFloat(item.laczna_kwota || 0));
                 document.getElementById('sumaMiWisza').innerText = sumaMiWisza.toFixed(2);
@@ -863,8 +912,9 @@
         
         tablica.forEach(grup => {
             let szczegolyHTML = grup.szczegoly.map(sz => 
-                `<div style="font-size: 13px; margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--border-color);">
-                    <b>${sz.wydarzenie}</b>: ${sz.kwota} zł <span style="color:gray;">(za ${sz.za_ile_osob} os.)</span>
+                // POPRAWKA: Klikalny link prowadzący bezpośrednio do wydarzenia
+                `<div style="font-size: 13px; margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--border-color); cursor: pointer;" onclick="otworzSzczegoly('${sz.id_wydarzenia}')">
+                    <b style="color: #1976D2; text-decoration: underline;">${sz.wydarzenie}</b>: ${sz.kwota} zł <span style="color:gray;">(za ${sz.za_ile_osob} os.)</span>
                 </div>`
             ).join('');
 
@@ -908,7 +958,6 @@
                     div.innerHTML = "<p style='text-align:center;'>Nie masz dodanych żadnych gości na ten mecz.</p>"; 
                 } else {
                     goscie.forEach(g => {
-                        // Flaga czy_zaplacil_mi odpowiada Kolumnie J w Twoim arkuszu
                         const isChecked = g.czy_zaplacil_mi ? "checked" : "";
                         div.innerHTML += `
                             <div class="flex-row" style="background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color);">
@@ -927,7 +976,6 @@
         const div = document.getElementById('podpowiedziGosci');
         if(fraza.length < 2) { div.style.display = "none"; return; }
         
-        // Cache zapobiega bombardowaniu arkusza Apps Script przy każdej wpisanej literce
         if(cacheWszyscyGracze.length === 0) {
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_all_users" }) })
             .then(r => r.json()).then(data => {
@@ -948,7 +996,6 @@
         
         if(wynik.length > 0) {
             wynik.forEach(u => {
-                // Używamy imie_krotkie z Twojego formatu
                 div.innerHTML += `<div class="dropdown-item" onclick="dodajGraczaDoEkipy('${u.id}', '${u.imie_krotkie}')">${u.imie}</div>`;
             });
             div.style.display = "block";
@@ -957,12 +1004,20 @@
         }
     }
 
+    // POPRAWKA: Dodawanie gościa spoza systemu "z palca"
+    function dodajGraczaSpozaListy() {
+        const wpisaneImie = document.getElementById('nazwaGoscia').value.trim();
+        if(wpisaneImie.length < 2) { alert("Wpisz chociaż 2 litery imienia!"); return; }
+        // Przekazujemy puste ID, backend nada mu GOSC_ + random
+        dodajGraczaDoEkipy("", wpisaneImie); 
+    }
+
     function dodajGraczaDoEkipy(idGracza, imieGoscia) {
         document.getElementById('podpowiedziGosci').style.display = "none";
         document.getElementById('nazwaGoscia').value = "";
         
         const mojeId = localStorage.getItem('mojeId');
-        const mojeImie = localStorage.getItem('mojeImie'); // Apps Script potrzebuje Twojego imienia, by zbudować nazwę: Gość (Gość: Ty)
+        const mojeImie = localStorage.getItem('mojeImie'); 
         
         pokazLoading("Dodawanie gościa...");
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "add_guest", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId, id_goscia: idGracza, imie_goscia: imieGoscia, imie: mojeImie }) })
@@ -979,8 +1034,6 @@
 
     // ================= PANEL ORGANIZATORA =================
 
-    let listaDluznikowWydarzenia = [];
-
     function otworzPanelOrganizatora() {
         pokazEkran('ekranPanelOrganizatora');
         odswiezPanelOrganizatora();
@@ -988,7 +1041,6 @@
 
     function odswiezPanelOrganizatora() {
         pokazLoading("Ładowanie listy graczy...");
-        listaDluznikowWydarzenia = [];
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_event_manage_details", id_wydarzenia: aktualneWydarzenieId }) })
         .then(r => r.json()).then(data => {
@@ -1001,15 +1053,6 @@
                 if(uczestnicy.length === 0) { div.innerHTML = "<p>Brak zapisanych osób na liście.</p>"; return; }
 
                 uczestnicy.forEach(u => {
-                    // Budowanie paczki do grupowego odhaczania dla mark_debts_paid
-                    if (!u.czy_zaplacil && u.czy_gra) {
-                        listaDluznikowWydarzenia.push({ id_wydarzenia: aktualneWydarzenieId, id_dluznika: u.id_uzytkownika });
-                    } else if (!u.czy_gra && u.goscie) {
-                        let maDlugGosci = false;
-                        u.goscie.forEach(g => { if(!g.czy_zaplacil) maDlugGosci = true; });
-                        if(maDlugGosci) listaDluznikowWydarzenia.push({ id_wydarzenia: aktualneWydarzenieId, id_dluznika: u.id_uzytkownika });
-                    }
-
                     const isChecked = u.czy_zaplacil ? "checked" : "";
                     const kolorTla = u.czy_gra ? "var(--card-bg)" : "#f9f9f9";
                     const napisTyp = u.czy_gra ? "Gracz" : "Tylko Goście";
@@ -1060,7 +1103,6 @@
     function usunGracza(idKicked) {
         if(confirm("Czy na pewno chcesz usunąć tę osobę z wydarzenia?")) {
             pokazLoading("Wyrzucanie...");
-            // Backend wymaga "kicked_user_id"
             fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "kick_player", id_wydarzenia: aktualneWydarzenieId, kicked_user_id: idKicked }) })
             .then(r => r.json()).then(data => { ukryjLoading(); odswiezPanelOrganizatora(); });
         }
@@ -1068,29 +1110,27 @@
 
     function przesunGracza(userId, kierunek) {
         pokazLoading("Przesuwanie...");
-        // Zgodnie z backendem: action: move_player, id_wydarzenia, user_id, direction ("up" lub "down")
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "move_player", id_wydarzenia: aktualneWydarzenieId, user_id: userId, direction: kierunek }) })
         .then(r => r.json()).then(data => { ukryjLoading(); odswiezPanelOrganizatora(); });
     }
 
     function zaznaczWplate(idUczestnika, stan) {
-        // Backend oczekuje formatu: id_uzytkownika = id odhaczanej osoby, pole = "czy_zaplacil", wartosc = true/false
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "toggle_payment", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: idUczestnika, pole: "czy_zaplacil", wartosc: stan }) });
     }
 
+    // POPRAWKA: Przycisk zaciąga jednokierunkowo kasę, którą goście oddali swoim opiekunom
     function rozliczWszystkieDlugi() {
-        if(listaDluznikowWydarzenia.length === 0) {
-            alert("Wszyscy na liście są już oznaczeni jako opłaceni!"); return;
-        }
-        if(confirm(`Zostanie masowo oznaczonych ${listaDluznikowWydarzenia.length} kont i wszystkich ich gości jako opłaconych. Kontynuować?`)) {
-            pokazLoading("Masowe rozliczanie...");
-            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "mark_debts_paid", debts: listaDluznikowWydarzenia }) })
-            .then(r => r.json()).then(data => { 
-                ukryjLoading(); 
-                alert("Wszystkie długi z tego meczu zostały rozliczone!"); 
-                odswiezPanelOrganizatora(); 
-            });
-        }
+        pokazLoading("Synchronizowanie wpłat gości...");
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "sync_guest_payments", id_wydarzenia: aktualneWydarzenieId }) })
+        .then(r => r.json()).then(data => { 
+            ukryjLoading(); 
+            if(data.status === "success" && data.zaktualizowano) {
+                alert("Zsynchronizowano wpłaty! Goście, którzy oddali pieniądze opiekunom zostali oznaczeni jako opłaceni u Organizatora."); 
+            } else {
+                alert("Brak nowych wpłat od gości do synchronizacji.");
+            }
+            odswiezPanelOrganizatora(); 
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
     }
 
     function usunWydarzenie() {
@@ -1111,7 +1151,7 @@
         }
     }
 
-    // Dodanie prostego zabezpieczenia pod Service Workery (jeśli to wrzucisz jako PWA)
+    // Rejestracja Service Workera (PWA)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').catch((err) => console.log('Brak Service Workera lub błąd', err));
