@@ -12,229 +12,181 @@
     <meta name="theme-color" content="#F57C00">
     
     <style>
-        /* ZMIENNE KOLORYSTYCZNE - SYSTEMOWY JASNY/CIEMNY MOTYW */
         :root {
-            --bg-color: #f4f4f9;
-            --text-color: #333333;
-            --card-bg: #ffffff;
-            --border-color: #cccccc;
-            --input-bg: #ffffff;
-            --box-bg: #e0e0e0;
-            --menu-bg: #ffffff;
+            --bg-color: #f4f4f9; --text-color: #333333; --card-bg: #ffffff;
+            --border-color: #cccccc; --input-bg: #ffffff; --box-bg: #e0e0e0; --menu-bg: #ffffff;
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #121212;
-                --text-color: #e0e0e0;
-                --card-bg: #1e1e1e;
-                --border-color: #333333;
-                --input-bg: #2c2c2c;
-                --box-bg: #181818;
-                --menu-bg: #2c2c2c;
+                --bg-color: #121212; --text-color: #e0e0e0; --card-bg: #1e1e1e;
+                --border-color: #333333; --input-bg: #2c2c2c; --box-bg: #181818; --menu-bg: #2c2c2c;
             }
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        /* ELEMENTY FORMULARZY I PRZYCISKI */
-        input {
-            width: 100%;
-            height: 50px;
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
-            border: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border-radius: 8px;
-        }
-        
-        button {
-            width: 100%;
-            height: 55px;
-            background-color: #F57C00;
-            color: white;
-            font-size: 15px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-        
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 0; margin: 0; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; position: relative; }
+        input, select, textarea { width: 100%; height: 50px; margin-bottom: 15px; padding: 10px; font-size: 16px; box-sizing: border-box; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); border-radius: 8px; font-family: inherit; }
+        textarea { height: 80px; resize: none; }
+        .checkbox-container { display: flex; align-items: center; margin-bottom: 15px; font-size: 14px; }
+        .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; margin: 0 10px 0 0; }
+        button { width: 100%; height: 55px; background-color: #F57C00; color: white; font-size: 15px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 12px; text-transform: uppercase; }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
         button.nav-btn { background-color: #1976D2; }
         button.sec-btn { background-color: #388E3C; }
         button.grey-btn { background-color: #757575; }
         button.purple-btn { background-color: #9C27B0; }
+        button.red-btn { background-color: #D32F2F; }
+        button.black-btn { background-color: #000000; color: white; }
         button.text-btn { background-color: transparent; color: #1976D2; height: auto; text-transform: none; text-decoration: underline; margin-top: 5px; }
-        
-        /* ZARZĄDZANIE EKRANAMI */
         .ekran { display: none; }
         .aktywny { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* GÓRNY PASEK Z 3 KROPKAMI */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .logo-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-        }
-        .menu-dots {
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0 10px;
-            user-select: none;
-        }
-        
-        /* ROZWIJANE MENU */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 40px;
-            right: 0;
-            background-color: var(--menu-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 100;
-            overflow: hidden;
-            width: 180px;
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; }
+        .logo-container { flex-grow: 1; display: flex; justify-content: center; }
+        .action-icons { display: flex; gap: 15px; align-items: center; }
+        .icon-btn { font-size: 26px; cursor: pointer; user-select: none; }
+        .dropdown-menu { display: none; position: absolute; top: 40px; right: 0; background-color: var(--menu-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; width: 180px; }
         .dropdown-menu.pokaz { display: block; }
-        .dropdown-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item { padding: 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; text-align: left; font-size: 14px; font-weight: bold; }
         .dropdown-item:hover { opacity: 0.8; }
-
-        /* KAFELKI I BOXY */
-        .kafelek-wydarzenia {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-            text-align: left;
-            border-left: 5px solid #388E3C;
-        }
+        .kafelek-wydarzenia { background-color: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.15); border-left: 5px solid #388E3C; cursor: pointer; }
         .kafelek-tytul { font-size: 18px; font-weight: bold; margin-bottom: 5px; color: #1976D2;}
-        .kafelek-detale { font-size: 14px; margin-bottom: 4px; color: var(--text-color); opacity: 0.9;}
+        .kafelek-detale { font-size: 14px; margin-bottom: 4px; opacity: 0.9;}
         .kafelek-badge { display: inline-block; background-color: var(--border-color); color: var(--text-color); padding: 4px 10px; border-radius: 12px; font-size: 12px; margin-top: 5px; font-weight: bold;}
-        
-        .box-tresc { background-color: var(--card-bg); color: var(--text-color); padding: 20px; border-radius: 12px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .box-tresc { background-color: var(--card-bg); padding: 20px; border-radius: 12px; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .box-lista { background-color: var(--box-bg); padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border-color); }
-
-        /* NAKŁADKA ŁADOWANIA (OVERLAY) */
-        #loadingOverlay {
-            display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 9999;
-            flex-direction: column; justify-content: center; align-items: center;
-            color: white; font-size: 18px; font-weight: bold;
-        }
-        .spinner {
-            border: 6px solid #f3f3f3; border-top: 6px solid #F57C00;
-            border-radius: 50%; width: 50px; height: 50px;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
+        .flex-row { display: flex; justify-content: space-between; align-items: center; }
+        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 18px; font-weight: bold; text-align: center; padding: 20px; box-sizing: border-box; }
+        .spinner { border: 6px solid #f3f3f3; border-top: 6px solid #F57C00; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* ZDJĘCIE O APLIKACJI */
-        .info-img { width: 100%; border-radius: 12px; margin-bottom: 15px; object-fit: contain; }
     </style>
 </head>
 <body>
+    <div id="loadingOverlay"><div class="spinner"></div><div id="loadingText">Przetwarzanie...</div></div>
 
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-        <div id="loadingText">Przetwarzanie...</div>
-    </div>
-
-    <div class="container">
+    <div class="container" id="mainContainer">
         
-        <div id="ekranLogowania" class="ekran">
+        <div id="ekranLogowania" class="ekran aktywny">
             <h1 style="color: #F57C00; text-align: center; margin-bottom: 25px;">SiatkaPiwo</h1>
             <p style="text-align: center;">Zaloguj się do systemu</p>
             <input type="text" id="login" placeholder="Twój login">
             <input type="password" id="haslo" placeholder="Twoje hasło">
             <button onclick="zaloguj()">ZALOGUJ SIĘ</button>
-            <div style="text-align: center;">
-                <button class="text-btn" onclick="pokazEkran('ekranRejestracji')">Nie masz konta? Utwórz je tutaj</button>
-            </div>
+            <div style="text-align: center;"><button class="text-btn" onclick="pokazEkran('ekranRejestracji')">Nie masz konta? Utwórz je tutaj</button></div>
             <div id="message" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
         </div>
 
         <div id="ekranRejestracji" class="ekran">
             <h1 style="color: #F57C00; text-align: center; margin-bottom: 25px;">SiatkaPiwo</h1>
             <p style="text-align: center;">Wypełnij dane, aby utworzyć konto</p>
-            <input type="text" id="rejImie" placeholder="Imię (np. Łukasz)">
-            <input type="text" id="rejLogin" placeholder="Wymyśl login">
-            <input type="password" id="rejHaslo" placeholder="Wymyśl hasło">
-            <input type="password" id="rejHaslo2" placeholder="Powtórz hasło">
+            <input type="text" id="rejImie" placeholder="Imię (Wymagane)">
+            <input type="text" id="rejNazwisko" placeholder="Nazwisko (Wymagane)">
+            <input type="text" id="rejLogin" placeholder="Login (Wymagane)">
+            <input type="password" id="rejHaslo" placeholder="Hasło (Wymagane)">
+            <input type="password" id="rejHaslo2" placeholder="Powtórz hasło (Wymagane)">
+            
+            <p style="text-align: left; margin: 15px 0 5px 0; font-weight: bold; font-size: 14px;">Dane opcjonalne:</p>
+            <input type="text" id="rejPseudo" placeholder="Pseudonim">
+            <select id="rejPozycja">
+                <option value="">Wybierz pozycję...</option>
+                <option value="S">S (Rozgrywający)</option>
+                <option value="OH">OH (Przyjmujący)</option>
+                <option value="MB">MB (Środkowy)</option>
+                <option value="OP">OP (Atakujący)</option>
+                <option value="L">L (Libero)</option>
+            </select>
+            <input type="number" id="rejTelefon" placeholder="Nr telefonu do BLIK (np. 123456789)" oninput="this.value=this.value.slice(0,9)">
+            <input type="number" id="rejNumerek" placeholder="Ulubiony numerek (max 2 cyfry)" oninput="this.value=this.value.slice(0,2)">
+            
             <button class="sec-btn" onclick="zarejestruj()">UTWÓRZ KONTO</button>
             <button class="grey-btn" onclick="pokazEkran('ekranLogowania')">WRÓĆ DO LOGOWANIA</button>
+            <div id="rejMessage" style="margin-top: 15px; font-weight: bold; text-align: center;"></div>
         </div>
-
-        <div id="ekranGlowny" class="ekran">
+		
+		<div id="ekranGlowny" class="ekran">
             <div class="top-bar">
-                <div style="width: 28px;"></div> <div class="logo-container">
-                    <picture>
-                        <source srcset="logo1.png" media="(prefers-color-scheme: dark)">
-                        <img src="logo_white.png" alt="SiatkaPiwo Logo" style="height: 50px; width: auto; display: block;">
-                    </picture>
+                <div style="width: 50px;"></div>
+                <div class="logo-container">
+                    <h2 style="color: #F57C00; margin: 0;">SiatkaPiwo</h2>
                 </div>
-                <div class="menu-dots" onclick="toggleMenu()">⋮</div>
-                
+                <div class="action-icons">
+                    <div class="icon-btn" onclick="pokazEkran('ekranOAplikacji')">ℹ️</div>
+                    <div class="icon-btn menu-dots" onclick="toggleMenu()">⋮</div>
+                </div>
                 <div id="dropdownMenu" class="dropdown-menu">
                     <div class="dropdown-item" onclick="otworzEdycjeProfilu()">⚙️ Edytuj profil</div>
-                    <div class="dropdown-item" style="color: #D32F2F;" onclick="wyloguj()">🚪 Wyloguj się</div>
+                    <div class="dropdown-item" style="color: #D32F2F;" onclick="potwierdzWylogowanie()">🚪 Wyloguj się</div>
                 </div>
             </div>
-            
             <h2 id="powitanieUsera" style="text-align: center; margin-bottom: 25px;">Cześć!</h2>
-            
-            <button class="nav-btn" onclick="otworzListeWydarzen()">📅 LISTA MECZÓW</button>
-            <button class="sec-btn" onclick="alert('Rozliczenia w przygotowaniu.')">💰 MOJE ROZLICZENIA</button>
-            <button class="grey-btn" onclick="pokazEkran('ekranOAplikacji')">ℹ️ O APLIKACJI</button>
+            <button class="nav-btn" onclick="otworzFiltryWydarzen()">📅 DOSTĘPNE WYDARZENIA</button>
+            <button class="nav-btn" style="background-color: #1976D2;" onclick="otworzTworzenieWydarzenia()">➕ UTWÓRZ WYDARZENIE</button>
+            <button class="sec-btn" onclick="otworzRozliczeniaGlobalne()">💰 MOJE ROZLICZENIA</button>
         </div>
 
-        <div id="ekranListaWydarzen" class="ekran">
+        <div id="ekranOAplikacji" class="ekran">
             <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
-            <h2 style="text-align: center;">Dostępne mecze</h2>
+            <div class="box-tresc" style="text-align: center;">
+                <h3 style="color: #1976D2; margin-top: 0;">🏐 SiatkaPiwo 🍺</h3>
+                <p>Aplikacja do zarządzania listami zapisów i automatyzacji rozliczeń.</p>
+                <p style="font-size: 12px; color: gray;">Wersja Web 1.0 (Połączona z Twoim Apps Script)</p>
+                <button class="grey-btn" style="background-color: #F4B400; color: #000; margin-top: 15px;" onclick="window.open('https://drive.google.com/drive/folders/1JMywmWz9G6CYm2UswgerT-SBqCoGN6SX?usp=drive_link', '_blank')">📁 DYSK GOOGLE</button>
+            </div>
+        </div>
+
+        <div id="ekranProfilu" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
+            <h2 style="text-align: center;">Edycja Profilu</h2>
+            <div class="box-tresc">
+                <label><b>Imię:</b></label><input type="text" id="profImie">
+                <label><b>Nazwisko:</b></label><input type="text" id="profNazwisko">
+                <label><b>Pseudonim:</b></label><input type="text" id="profPseudo">
+                <label><b>Pozycja:</b></label>
+                <select id="profPozycja">
+                    <option value="">Wybierz pozycję...</option>
+                    <option value="S">S (Rozgrywający)</option>
+                    <option value="OH">OH (Przyjmujący)</option>
+                    <option value="MB">MB (Środkowy)</option>
+                    <option value="OP">OP (Atakujący)</option>
+                    <option value="L">L (Libero)</option>
+                </select>
+                <label><b>Nr telefonu (BLIK):</b></label><input type="number" id="profTelefon" oninput="this.value=this.value.slice(0,9)">
+                <label><b>Ulubiony numerek:</b></label><input type="number" id="profNumerek" oninput="this.value=this.value.slice(0,2)">
+                <button class="sec-btn" onclick="zapiszProfil()" style="margin-top: 15px;">ZAPISZ DANE PROFILOWE</button>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+                
+                <button class="nav-btn" onclick="document.getElementById('sekcjaZmianyHasla').style.display='block'; this.style.display='none';">Zmień hasło</button>
+                <div id="sekcjaZmianyHasla" style="display: none; background: var(--bg-color); padding: 15px; border-radius: 8px;">
+                    <label><b>Stare hasło:</b></label><input type="password" id="profHasloStare">
+                    <label><b>Nowe hasło:</b></label><input type="password" id="profHasloNowe">
+                    <button class="sec-btn" onclick="zmienHaslo()">POTWIERDŹ ZMIANĘ HASŁA</button>
+                </div>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+                <button class="red-btn" onclick="document.getElementById('sekcjaUsuwaniaKonta').style.display='block'; this.style.display='none';">Usuń konto</button>
+                <div id="sekcjaUsuwaniaKonta" style="display: none; background: #ffebee; padding: 15px; border-radius: 8px;">
+                    <label style="color: #D32F2F;"><b>Aktualne hasło (Wymagane do usunięcia):</b></label>
+                    <input type="password" id="profHasloUsun">
+                    <button class="red-btn" onclick="potwierdzUsuniecieKonta()">POTWIERDŹ USUNIĘCIE KONTA</button>
+                </div>
+            </div>
+        </div>
+		
+		<div id="ekranListaWydarzen" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
+            <h2 style="text-align: center;">Wydarzenia</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <select id="filtrKategoria" onchange="aktualizujFiltry()" style="margin-bottom: 0;">
+                    <option value="aktywne">Aktywne</option>
+                    <option value="zakonczone">Zakończone</option>
+                </select>
+                <select id="filtrRola" onchange="aktualizujFiltry()" style="margin-bottom: 0;">
+                    <option value="pozostale">Pozostałe</option>
+                    <option value="biore_udzial">Biorę udział</option>
+                    <option value="organizuje">Organizuję</option>
+                </select>
+            </div>
             <div id="listaWydarzen" style="margin-top: 15px;"></div>
         </div>
 
@@ -242,492 +194,929 @@
             <button class="grey-btn" onclick="pokazEkran('ekranListaWydarzen')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do listy</button>
             <div id="szczegolyTresc" class="box-tresc"></div>
             
-            <button id="btnCzat" class="purple-btn" style="margin-top: 15px; display: none;" onclick="alert('Funkcja czatu pojawi się wkrótce!')">CZAT WYDARZENIA (Wkrótce)</button>
-            <button id="btnZapiszSie" onclick="obsluzZapis()" style="margin-top: 15px; display: none;"></button>
-        </div>
-
-        <div id="ekranProfilu" class="ekran">
-            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
-            <h2 style="text-align: center;">Twój Profil</h2>
-            <div class="box-tresc">
-                <label><b>Imię i Nazwisko:</b></label>
-                <input type="text" id="profImie" style="margin-top: 5px;" readonly>
-                <label><b>ID Użytkownika:</b></label>
-                <input type="text" id="profId" style="margin-top: 5px;" readonly>
-                <p style="font-size: 13px; color: gray; text-align: center;">Zmiana danych z poziomu WWW (edycja imienia/hasła) będzie możliwa w wersji V1.1.</p>
-            </div>
-        </div>
-
-        <div id="ekranOAplikacji" class="ekran">
-            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
-            <div class="box-tresc" style="text-align: center;">
-                <img src="autor.jpg" class="info-img" alt="Informacje o aplikacji">
-                <h3>SiatkaPiwo V1.0</h3>
-                <p style="font-size: 14px; line-height: 1.5; text-align: justify;">
-                            🏐SiatkaPiwo🍺 v1.0
-        
-        Aplikacja do zarządzania listami zapisów do gry w siatkę (I NIE TYLKO!) oraz automatyzacji rozliczeń wewnątrz ekipy.
-
-        Twórca: Łukasz Krystoń
-        Student EiT na wydziale AEiI Politechniki Śląskiej.
-
-        Jeśli podoba Ci się moja praca i ułatwiła Ci życie, możesz postawić mi symboliczne piwo BLIK-iem na numer: 721868448 🍻
-
-        Wszelkie prawa zastrzeżone.
-        
-        
-        Dziękuję za motywację! Dzięki wam powstała ta abominacja nazywana też aplikacją  💚 
-                </p>
-                <p style="font-size: 14px; font-weight: bold;">Zdjęcie pamiątkowe z dnia 8 kwietnia 2026 roku autorstwa Bartosza Błaszczyka.</p>
-            </div>
-        </div>
-
-    </div>
-	
-	<script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwBiHv4GuJJwbpV-L8O5oXe-cdK7W0nlGnVG8DC1MDHVNBW4au2nt_W65Ab12S_G00I/exec";
-
-        let aktualneWydarzenieId = null;
-        let czyJestemZapisany = false;
-        let jestemOrganizatorem = false;
-
-        // --- NARZĘDZIA UI ---
-        function pokazLoading(tekst = "Przetwarzanie...") {
-            document.getElementById('loadingText').innerText = tekst;
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        }
-
-        function ukryjLoading() {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }
-
-        function pokazEkran(idEkranu) {
-            const ekrany = ['ekranLogowania', 'ekranRejestracji', 'ekranGlowny', 'ekranListaWydarzen', 'ekranSzczegolow', 'ekranProfilu', 'ekranOAplikacji'];
-            ekrany.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('aktywny');
-            });
-            const aktywnyEl = document.getElementById(idEkranu);
-            if (aktywnyEl) aktywnyEl.classList.add('aktywny');
+            <button id="btnBlik" class="black-btn" style="margin-top: 15px; display: none;" onclick="kopiujBlik()">Kopiuj BLIK</button>
+            <button id="btnZapiszSie" onclick="potwierdzZapis()" style="margin-top: 10px; display: none;"></button>
             
-            // Zamknij menu, jeśli było otwarte
-            const menu = document.getElementById('dropdownMenu');
-            if (menu) menu.classList.remove('pokaz');
-        }
+            <button id="btnZarzadzajGoscmi" style="background-color: #F57C00; margin-top: 10px; display: none;" onclick="otworzMojaEkipe()">MOJA EKIPA (ZARZĄDZAJ GOŚĆMI)</button>
+            <button id="btnMenuOrganizatora" class="nav-btn" style="margin-top: 10px; display: none;" onclick="otworzPanelOrganizatora()">PANEL ORGANIZATORA</button>
+        </div>
 
-        function toggleMenu() {
-            document.getElementById('dropdownMenu').classList.toggle('pokaz');
-        }
+        <div id="ekranTworzeniaWydarzenia" class="ekran">
+            <button id="btnWrocTworzenie" class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć</button>
+            <h2 id="tytulTworzenia" style="text-align: center;">Nowe Wydarzenie</h2>
+            <div class="box-tresc">
+                <input type="hidden" id="edycjaWydarzenieId">
+                <label><b>Nazwa wydarzenia:</b></label><input type="text" id="noweNazwa" placeholder="np. Niedzielne granie">
+                <label><b>Miejsce:</b></label><input type="text" id="noweMiejsce" placeholder="np. Hala OSiR">
+                
+                <div class="flex-row" style="gap: 10px;">
+                    <div style="flex: 1;"><label><b>Data:</b></label><input type="date" id="noweData" style="margin-bottom: 15px;"></div>
+                    <div style="flex: 1;"><label><b>Godzina:</b></label><input type="time" id="noweCzas" style="margin-bottom: 15px;"></div>
+                </div>
+                
+                <label><b>Typ płatności:</b></label>
+                <select id="noweTypCeny" onchange="document.getElementById('noweKosztDiv').style.display = (this.value === 'Darmowe' ? 'none' : 'block');">
+                    <option value="Darmowe">Za darmo</option>
+                    <option value="Za osobę">Sztywna kwota za osobę</option>
+                    <option value="Za całość">Do równego podziału (Za całość)</option>
+                </select>
+                
+                <div id="noweKosztDiv" style="display: none;">
+                    <label><b>Kwota (zł):</b></label>
+                    <input type="number" id="noweKoszt" value="0" step="0.5" min="0">
+                </div>
+                
+                <label><b>Limit miejsc (0 = bez limitu):</b></label><input type="number" id="noweLimit" value="0" min="0">
+                <label><b>Dodatkowe uwagi:</b></label><textarea id="noweUwagi" placeholder="np. Gramy na dwóch boiskach"></textarea>
+                
+                <button class="sec-btn" onclick="zapiszWydarzenie()">ZAPISZ WYDARZENIE</button>
+            </div>
+        </div>
+		
+		<div id="ekranRozliczen" class="ekran">
+            <button class="grey-btn" onclick="pokazEkran('ekranGlowny')" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do Menu</button>
+            <h2 style="text-align: center;">Rozliczenia</h2>
+            <div class="box-tresc">
+                <h3 style="color: #D32F2F; margin-top: 0;">Zalegam (Wisisz: <span id="sumaWisze">0.00</span> zł)</h3>
+                <div id="listaWisze"></div>
+            </div>
+            <div class="box-tresc">
+                <h3 style="color: #388E3C; margin-top: 0;">Oczekuję (Wiszą Ci: <span id="sumaMiWisza">0.00</span> zł)</h3>
+                <div id="listaMiWisza"></div>
+            </div>
+        </div>
 
-        // Zamykanie menu po kliknięciu poza nie
-        window.onclick = function(event) {
-            if (!event.target.matches('.menu-dots')) {
-                const dropdowns = document.getElementsByClassName("dropdown-menu");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    if (dropdowns[i].classList.contains('pokaz')) {
-                        dropdowns[i].classList.remove('pokaz');
-                    }
+        <div id="ekranMojaEkipa" class="ekran">
+            <button class="grey-btn" onclick="otworzSzczegoly(aktualneWydarzenieId)" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do szczegółów</button>
+            <h2 style="text-align: center;">Moja Ekipa</h2>
+            <div class="box-tresc">
+                <label><b>Dodaj gościa z bazy graczy:</b></label>
+                <div style="position: relative;">
+                    <input type="text" id="nazwaGoscia" placeholder="Wpisz minimum 2 litery imienia..." oninput="szukajGraczaDoEkipy(this.value)">
+                    <div id="podpowiedziGosci" class="dropdown-menu" style="width: 100%; top: 55px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            <h3 style="margin-top: 20px;">Zapisani goście:</h3>
+            <div id="listaMojejEkipy"></div>
+        </div>
+
+        <div id="ekranPanelOrganizatora" class="ekran">
+            <button class="grey-btn" onclick="otworzSzczegoly(aktualneWydarzenieId)" style="height: 45px; margin-bottom: 15px;">⬅ Wróć do szczegółów</button>
+            <h2 style="text-align: center;">Panel Organizatora</h2>
+            
+            <button class="nav-btn" onclick="wczytajDoEdycji()">✏️ EDYTUJ WYDARZENIE</button>
+            <button class="red-btn" onclick="usunWydarzenie()">🗑️ USUŃ WYDARZENIE</button>
+            <button class="black-btn" onclick="zakonczWydarzenie()">🛑 ZAKOŃCZ WYDARZENIE</button>
+            
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+            <h3 style="margin-bottom: 10px;">Zarządzanie graczami:</h3>
+            <div id="listaZarzadzaniaGraczami"></div>
+            
+            <button class="sec-btn" style="margin-top: 15px;" onclick="rozliczWszystkieDlugi()">✅ ROZLICZ WSZYSTKIE DŁUGI DLA TEGO MECZU</button>
+        </div>
+
+    </div> <script>
+    // Konfiguracja API - link do Twojego Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbz3Rzg3fCYnfPrMMpsOaMqv6NyeHa5sdJVB6WYE17tRUbgYj3s5n5r04RHgVzrgRIQb/exec";
+    
+    // Zmienne globalne do utrzymywania stanu aplikacji
+    let aktualneWydarzenieId = null;
+    let czyJestemZapisany = false;
+    let globalneWydarzenia = [];
+    let nrBlikOrganizatora = "";
+
+    // Funkcje pomocnicze UI
+    function pokazLoading(tekst = "Przetwarzanie...") {
+        document.getElementById('loadingText').innerText = tekst;
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    function ukryjLoading() { 
+        document.getElementById('loadingOverlay').style.display = 'none'; 
+    }
+
+    function pokazEkran(idEkranu) {
+        const ekrany = document.querySelectorAll('.ekran');
+        ekrany.forEach(el => el.classList.remove('aktywny'));
+        const aktywnyEl = document.getElementById(idEkranu);
+        if (aktywnyEl) aktywnyEl.classList.add('aktywny');
+        
+        const menu = document.getElementById('dropdownMenu');
+        if (menu) menu.classList.remove('pokaz');
+    }
+
+    function toggleMenu() { 
+        document.getElementById('dropdownMenu').classList.toggle('pokaz'); 
+    }
+
+    // Zamykanie menu po kliknięciu poza nim
+    window.onclick = function(event) {
+        if (!event.target.matches('.menu-dots')) {
+            const dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (let i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].classList.contains('pokaz')) {
+                    dropdowns[i].classList.remove('pokaz');
                 }
             }
         }
+    }
+	
+	// Inicjalizacja przy wejściu na stronę
+    window.onload = function() { 
+        sprawdzSesje(); 
+    };
 
-        // --- AUTORYZACJA I SESJA ---
-        async function hashujHaslo(haslo) {
-            const msgBuffer = new TextEncoder().encode(haslo);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    function sprawdzSesje() {
+        const mojeId = localStorage.getItem('mojeId');
+        const mojeImie = localStorage.getItem('mojeImie');
+        if (mojeId && mojeImie) {
+            document.getElementById('powitanieUsera').innerText = "Cześć, " + mojeImie + "!";
+            pokazEkran('ekranGlowny');
+        } else {
+            pokazEkran('ekranLogowania');
         }
+    }
 
-        window.onload = function() {
-            sprawdzSesje();
-        };
+    // ================= LOGOWANIE I REJESTRACJA =================
+    
+    function zaloguj() {
+        const login = document.getElementById('login').value.trim();
+        const haslo = document.getElementById('haslo').value;
+        const msgDiv = document.getElementById('message');
 
-        function sprawdzSesje() {
-            const mojeId = localStorage.getItem('mojeId');
-            const mojeImie = localStorage.getItem('mojeImie');
+        if(!login || !haslo) { msgDiv.style.color = "red"; msgDiv.innerText = "Podaj login i hasło!"; return; }
 
-            if (mojeId && mojeImie) {
-                document.getElementById('powitanieUsera').innerText = "Cześć, " + mojeImie + "!";
-                pokazEkran('ekranGlowny');
-            } else {
-                pokazEkran('ekranLogowania');
-            }
-        }
+        pokazLoading("Logowanie...");
+        msgDiv.innerText = "";
 
-        async function zaloguj() {
-            const login = document.getElementById('login').value.trim();
-            const haslo = document.getElementById('haslo').value;
-            const msgDiv = document.getElementById('message');
+        // Hasło leci w oryginale - Apps Script zajmie się hashowaniem
+        const payload = { action: "logowanie", login: login, haslo: haslo };
 
-            if(!login || !haslo) {
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Podaj login i hasło!";
-                return;
-            }
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                localStorage.setItem('mojeId', data.id);
+                localStorage.setItem('mojeImie', data.imie);
+                document.getElementById('haslo').value = ""; 
+                sprawdzSesje(); 
+            } else { msgDiv.style.color = "red"; msgDiv.innerText = "Błąd: " + data.message; }
+        }).catch(err => { ukryjLoading(); msgDiv.style.color = "red"; msgDiv.innerText = "Błąd połączenia z serwerem."; });
+    }
 
-            pokazLoading("Logowanie...");
-            msgDiv.innerText = "";
-
-            try {
-                const zahashowaneHaslo = await hashujHaslo(haslo);
-                const payload = { action: "logowanie", login: login, haslo: zahashowaneHaslo };
-
-                fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-                .then(response => response.json())
-                .then(data => {
-                    ukryjLoading();
-                    if(data.status === "success") {
-                        localStorage.setItem('mojeId', data.id);
-                        localStorage.setItem('mojeImie', data.imie);
-                        document.getElementById('haslo').value = ""; 
-                        sprawdzSesje(); 
-                    } else {
-                        msgDiv.style.color = "red";
-                        msgDiv.innerText = "Błąd: " + data.message;
-                    }
-                })
-                .catch(error => {
-                    ukryjLoading();
-                    msgDiv.style.color = "red";
-                    msgDiv.innerText = "Błąd połączenia z serwerem.";
-                });
-            } catch (err) {
-                ukryjLoading();
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Błąd wewnętrzny kryptografii.";
-            }
-        }
-
-        async function zarejestruj() {
-            const imie = document.getElementById('rejImie').value.trim();
-            const login = document.getElementById('rejLogin').value.trim();
-            const haslo = document.getElementById('rejHaslo').value;
-            const haslo2 = document.getElementById('rejHaslo2').value;
-            
-            let msgDiv = document.getElementById('rejMessage');
-            if(!msgDiv) {
-                msgDiv = document.createElement('div');
-                msgDiv.id = 'rejMessage';
-                msgDiv.style.marginTop = '15px';
-                msgDiv.style.fontWeight = 'bold';
-                msgDiv.style.textAlign = 'center';
-                document.getElementById('ekranRejestracji').appendChild(msgDiv);
-            }
-
-            if(!imie || !login || !haslo || !haslo2) {
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Wypełnij wszystkie pola!";
-                return;
-            }
-
-            if(haslo !== haslo2) {
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Hasła nie są identyczne!";
-                return;
-            }
-
-            const regexZnakow = /^[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ _-]+$/;
-            if(!regexZnakow.test(imie) || !regexZnakow.test(login)) {
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Użyto niedozwolonych znaków (np. przecinków)!";
-                return;
-            }
-
-            pokazLoading("Tworzenie konta...");
-            msgDiv.innerText = "";
-
-            try {
-                const zahashowaneHaslo = await hashujHaslo(haslo);
-                const payload = { 
-                    action: "rejestracja", 
-                    imie: imie, 
-                    login: login, 
-                    haslo: zahashowaneHaslo 
-                };
-
-                fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-                .then(response => response.json())
-                .then(data => {
-                    ukryjLoading();
-                    if(data.status === "success") {
-                        alert("Konto utworzone pomyślnie! Możesz się teraz zalogować.");
-                        document.getElementById('rejImie').value = "";
-                        document.getElementById('rejLogin').value = "";
-                        document.getElementById('rejHaslo').value = "";
-                        document.getElementById('rejHaslo2').value = "";
-                        pokazEkran('ekranLogowania');
-                    } else {
-                        msgDiv.style.color = "red";
-                        msgDiv.innerText = "Błąd: " + data.message;
-                    }
-                })
-                .catch(error => {
-                    ukryjLoading();
-                    msgDiv.style.color = "red";
-                    msgDiv.innerText = "Błąd połączenia z serwerem.";
-                });
-            } catch (err) {
-                ukryjLoading();
-                msgDiv.style.color = "red";
-                msgDiv.innerText = "Błąd wewnętrzny.";
-            }
-        }
-
-        function wyloguj() {
+    function potwierdzWylogowanie() {
+        if(confirm("Czy na pewno chcesz się wylogować?")) {
             localStorage.clear();
             const msgDiv = document.getElementById('message');
             if(msgDiv) msgDiv.innerText = "";
             sprawdzSesje();
         }
+    }
 
-        function otworzEdycjeProfilu() {
-            document.getElementById('profImie').value = localStorage.getItem('mojeImie') || "";
-            document.getElementById('profId').value = localStorage.getItem('mojeId') || "";
-            pokazEkran('ekranProfilu');
-        }
-	
-	function otworzListeWydarzen() {
-            pokazEkran('ekranListaWydarzen');
-            const mojeId = localStorage.getItem('mojeId');
-            pobierzWydarzenia(mojeId);
-        }
+    function zarejestruj() {
+        const imie = document.getElementById('rejImie').value.trim();
+        const nazwisko = document.getElementById('rejNazwisko').value.trim();
+        const login = document.getElementById('rejLogin').value.trim();
+        const haslo = document.getElementById('rejHaslo').value;
+        const haslo2 = document.getElementById('rejHaslo2').value;
+        const pseudo = document.getElementById('rejPseudo').value.trim();
+        const pozycja = document.getElementById('rejPozycja').value;
+        const telefon = document.getElementById('rejTelefon').value.trim();
+        const numerek = document.getElementById('rejNumerek').value.trim();
+        const msgDiv = document.getElementById('rejMessage');
 
-        function pobierzWydarzenia(idUzytkownika) {
-            const listaDiv = document.getElementById('listaWydarzen');
-            pokazLoading("Pobieranie meczów...");
+        if(!imie || !nazwisko || !login || !haslo || !haslo2) { msgDiv.style.color = "red"; msgDiv.innerText = "Wypełnij wszystkie wymagane pola!"; return; }
+        if(haslo !== haslo2) { msgDiv.style.color = "red"; msgDiv.innerText = "Podane hasła nie są identyczne!"; return; }
+        if(telefon && telefon.length !== 9) { msgDiv.style.color = "red"; msgDiv.innerText = "Telefon musi mieć dokładnie 9 cyfr!"; return; }
 
-            const payload = { action: "get_all_events_extended", id_uzytkownika: idUzytkownika };
+        pokazLoading("Tworzenie konta...");
+        
+        // Generujemy unikalne ID zgodne z aplikacją mobilną
+        const noweId = "WEB_" + Date.now();
+        
+        const payload = { 
+            action: "rejestracja", id: noweId, imie: imie, nazwisko: nazwisko, 
+            login: login, haslo: haslo, pseudonim: pseudo, 
+            pozycja: pozycja, telefon: telefon, numerek: numerek 
+        };
 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(response => response.json())
-            .then(data => {
-                ukryjLoading();
-                if(data.status === "success") {
-                    wyrenderujKafelki(data.wydarzenia);
-                } else {
-                    listaDiv.innerHTML = "<p style='color:red;'>Błąd pobierania danych.</p>";
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                alert("Konto utworzone pomyślnie! Możesz się teraz zalogować.");
+                ['rejImie', 'rejNazwisko', 'rejLogin', 'rejHaslo', 'rejHaslo2', 'rejPseudo', 'rejPozycja', 'rejTelefon', 'rejNumerek'].forEach(id => document.getElementById(id).value = "");
+                msgDiv.innerText = "";
+                pokazEkran('ekranLogowania');
+            } else { msgDiv.style.color = "red"; msgDiv.innerText = "Błąd: " + data.message; }
+        }).catch(e => { ukryjLoading(); msgDiv.style.color = "red"; msgDiv.innerText = "Błąd połączenia z serwerem."; });
+    }
+
+    // ================= ZARZĄDZANIE PROFILEM =================
+
+    function otworzEdycjeProfilu() {
+        const mojeId = localStorage.getItem('mojeId');
+        pokazLoading("Pobieranie danych...");
+        
+        // Zgodnie z Apps Script uderzamy po get_user_info ze zmienną 'id'
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_user_info", id: mojeId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                document.getElementById('profImie').value = data.imie || "";
+                document.getElementById('profNazwisko').value = data.nazwisko || "";
+                document.getElementById('profPseudo').value = data.pseudonim || "";
+                document.getElementById('profPozycja').value = data.pozycja || "";
+                document.getElementById('profTelefon').value = data.telefon || "";
+                document.getElementById('profNumerek').value = data.numerek || "";
+                
+                document.getElementById('sekcjaZmianyHasla').style.display = 'none';
+                document.getElementById('sekcjaUsuwaniaKonta').style.display = 'none';
+                
+                const btns = document.getElementById('ekranProfilu').getElementsByTagName('button');
+                for(let i=0; i<btns.length; i++) {
+                    if(btns[i].innerText === 'Zmień hasło' || btns[i].innerText === 'Usuń konto') btns[i].style.display = 'block';
                 }
-            })
-            .catch(error => {
+                pokazEkran('ekranProfilu');
+            } else { alert("Błąd pobierania danych profilu."); }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+    }
+
+    function zapiszProfil() {
+        const imie = document.getElementById('profImie').value.trim();
+        const nazwisko = document.getElementById('profNazwisko').value.trim();
+        const pseudo = document.getElementById('profPseudo').value.trim();
+        const pozycja = document.getElementById('profPozycja').value;
+        const telefon = document.getElementById('profTelefon').value.trim();
+        const numerek = document.getElementById('profNumerek').value.trim();
+        const mojeId = localStorage.getItem('mojeId');
+
+        if(!imie || !nazwisko) { alert("Imię i nazwisko to pola wymagane!"); return; }
+        if(telefon && telefon.length !== 9) { alert("Telefon musi mieć dokładnie 9 cyfr!"); return; }
+
+        pokazLoading("Zapisywanie profilu...");
+        const payload = { action: "update_profile", id: mojeId, imie: imie, nazwisko: nazwisko, pseudonim: pseudo, pozycja: pozycja, telefon: telefon, numerek: numerek };
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                localStorage.setItem('mojeImie', imie);
+                document.getElementById('powitanieUsera').innerText = "Cześć, " + imie + "!";
+                alert("Profil został zaktualizowany!");
+                pokazEkran('ekranGlowny');
+            } else { alert("Błąd: " + data.message); }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+    }
+
+    function zmienHaslo() {
+        const stare = document.getElementById('profHasloStare').value;
+        const nowe = document.getElementById('profHasloNowe').value;
+        const mojeId = localStorage.getItem('mojeId');
+
+        if(!stare || !nowe) { alert("Podaj obecne i nowe hasło!"); return; }
+        pokazLoading("Zmiana hasła...");
+        
+        // Używamy zmiennych 'stare_haslo' i 'nowe_haslo' - czysty tekst
+        const payload = { action: "change_password", id: mojeId, stare_haslo: stare, nowe_haslo: nowe };
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                alert("Hasło zostało zmienione!");
+                document.getElementById('profHasloStare').value = "";
+                document.getElementById('profHasloNowe').value = "";
+                document.getElementById('sekcjaZmianyHasla').style.display = 'none';
+            } else { alert("Błąd: " + data.message); }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia."); });
+    }
+
+    function potwierdzUsuniecieKonta() {
+        const hasloUsun = document.getElementById('profHasloUsun').value;
+        if(!hasloUsun) { alert("Wpisz aktualne hasło, aby potwierdzić usunięcie konta!"); return; }
+        
+        if(confirm("UWAGA! Czy na pewno chcesz trwale usunąć swoje konto? Twój ślad na listach pozostanie dla organizatorów!")) {
+            const mojeId = localStorage.getItem('mojeId');
+            pokazLoading("Usuwanie konta...");
+            
+            // Backend Apps Script oczekuje 'id' oraz 'haslo'
+            const payload = { action: "delete_account", id: mojeId, haslo: hasloUsun };
+            
+            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+            .then(r => r.json()).then(data => {
                 ukryjLoading();
-                listaDiv.innerHTML = "<p style='color:red;'>Błąd połączenia z serwerem.</p>";
-            });
+                if(data.status === "success") { 
+                    alert(data.message || "Konto zostało usunięte."); 
+                    localStorage.clear(); 
+                    sprawdzSesje(); 
+                }
+                else { alert("Błąd: " + data.message); }
+            }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+        }
+    }
+	
+	// ================= LISTA WYDARZEŃ =================
+
+    function otworzFiltryWydarzen() {
+        pokazEkran('ekranListaWydarzen');
+        const mojeId = localStorage.getItem('mojeId');
+        pobierzWydarzenia(mojeId);
+    }
+
+    function pobierzWydarzenia(idUzytkownika) {
+        pokazLoading("Pobieranie meczów...");
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_all_events_extended", id_uzytkownika: idUzytkownika }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                globalneWydarzenia = data.wydarzenia || [];
+                aktualizujFiltry();
+            } else { document.getElementById('listaWydarzen').innerHTML = "<p style='color:red;'>Błąd pobierania danych.</p>"; }
+        }).catch(e => { ukryjLoading(); document.getElementById('listaWydarzen').innerHTML = "<p style='color:red;'>Błąd połączenia z serwerem.</p>"; });
+    }
+
+    function aktualizujFiltry() {
+        const kategoria = document.getElementById('filtrKategoria').value;
+        const rola = document.getElementById('filtrRola').value;
+        const mojeId = localStorage.getItem('mojeId');
+        
+        let przefiltrowane = globalneWydarzenia.filter(wyd => {
+            let statusMatch = (kategoria === "aktywne" && wyd.status !== "Zakończone") || (kategoria === "zakonczone" && wyd.status === "Zakończone");
+            let rolaMatch = false;
+            
+            if (rola === "pozostale") rolaMatch = (!wyd.czy_zapisany && wyd.organizator_id !== mojeId);
+            else if (rola === "biore_udzial") rolaMatch = wyd.czy_zapisany;
+            else if (rola === "organizuje") rolaMatch = (wyd.organizator_id === mojeId);
+            
+            return statusMatch && rolaMatch;
+        });
+        wyrenderujKafelki(przefiltrowane);
+    }
+
+    function wyrenderujKafelki(wydarzenia) {
+        const listaDiv = document.getElementById('listaWydarzen');
+        listaDiv.innerHTML = "";
+        
+        if(wydarzenia.length === 0) { 
+            listaDiv.innerHTML = "<p style='text-align:center;'>Brak wydarzeń spełniających kryteria.</p>"; 
+            return; 
         }
 
-        function wyrenderujKafelki(wydarzenia) {
-            const listaDiv = document.getElementById('listaWydarzen');
-            listaDiv.innerHTML = "";
+        wydarzenia.forEach(wyd => {
+            const limitTekst = wyd.limit > 0 ? wyd.limit : "Bez limitu";
+            const borderKolor = wyd.status === "Zakończone" ? "#9E9E9E" : "#388E3C";
+            const czyZapisanyTekst = wyd.czy_zapisany ? "<span style='color:#388E3C;'>Zapisany</span>" : "Brak zapisu";
+            
+            listaDiv.innerHTML += `
+                <div class="kafelek-wydarzenia" style="border-left-color: ${borderKolor};" onclick="otworzSzczegoly('${wyd.id_wydarzenia}')">
+                    <div class="kafelek-tytul">${wyd.nazwa}</div>
+                    <div class="kafelek-detale">📅 ${wyd.data}</div>
+                    <div class="kafelek-detale">📍 ${wyd.miejsce}</div>
+                    <div class="kafelek-badge">Zapisanych: ${wyd.zapisanych} / ${limitTekst}</div>
+                    <div class="kafelek-badge">${czyZapisanyTekst}</div>
+                </div>`;
+        });
+    }
 
-            if(!wydarzenia || wydarzenia.length === 0) {
-                listaDiv.innerHTML = "<p style='text-align:center;'>Brak zaplanowanych wydarzeń.</p>";
-                return;
-            }
+    // ================= SZCZEGÓŁY WYDARZENIA =================
 
-            wydarzenia.forEach(wyd => {
-                const limitTekst = wyd.limit > 0 ? wyd.limit : "Bez limitu";
-                const borderKolor = wyd.status === "Zakończone" ? "#9E9E9E" : "#388E3C";
-                const czyZapisanyTekst = wyd.czy_zapisany ? "<span style='color:#388E3C;'>Zapisany</span>" : "Brak zapisu";
+    function otworzSzczegoly(idWydarzenia) {
+        aktualneWydarzenieId = idWydarzenia;
+        const mojeId = localStorage.getItem('mojeId');
+        const trescDiv = document.getElementById('szczegolyTresc');
+        const btnZapisz = document.getElementById('btnZapiszSie');
+        const btnBlik = document.getElementById('btnBlik');
+        const btnZarzadzaj = document.getElementById('btnZarzadzajGoscmi');
+        const btnOrg = document.getElementById('btnMenuOrganizatora');
+        
+        pokazEkran('ekranSzczegolow');
+        pokazLoading("Ładowanie szczegółów...");
+        [btnZapisz, btnBlik, btnZarzadzaj, btnOrg].forEach(b => b.style.display = "none");
 
-                const htmlKafelka = `
-                    <div class="kafelek-wydarzenia" style="border-left-color: ${borderKolor}; cursor: pointer;" onclick="otworzSzczegoly('${wyd.id_wydarzenia}')">
-                        <div class="kafelek-tytul">${wyd.nazwa}</div>
-                        <div class="kafelek-detale">📅 ${wyd.data}</div>
-                        <div class="kafelek-detale">📍 ${wyd.miejsce}</div>
-                        
-                        <div class="kafelek-badge">Zapisanych: ${wyd.zapisanych} / ${limitTekst}</div>
-                        <div class="kafelek-badge">${czyZapisanyTekst}</div>
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_event_details", id_wydarzenia: idWydarzenia, id_uzytkownika: mojeId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                const r = data.raw_data || {};
+                czyJestemZapisany = data.czy_zapisany;
+                nrBlikOrganizatora = data.telefon_organizatora || "";
+                
+                const uczestnicyArray = data.uczestnicy || [];
+                let aktywnych = uczestnicyArray.filter(p => !p.startsWith("Rezerwa")).length;
+                let kosztNum = parseFloat((r.koszt || "0").toString().replace(",", ".")) || 0.0;
+                let aktualnyKoszt = kosztNum;
+                
+                // Dynamiczna cena za całość
+                const czyCenaDyn = ["ałość", "alość", "alosc"].some(s => (r.typ_ceny || "").toLowerCase().includes(s));
+                if (czyCenaDyn && aktywnych > 0) aktualnyKoszt = Math.ceil((kosztNum / aktywnych) * 2) / 2.0;
+
+                trescDiv.innerHTML = `
+                    <h2 style="color: #1976D2; margin-top: 0; margin-bottom: 15px;">${r.nazwa || "Brak nazwy"}</h2>
+                    <div style="line-height: 1.8; font-size: 15px;">
+                        <div>📍 <b>Miejsce:</b> ${r.miejsce || "Nieznane"}</div>
+                        <div>📅 <b>Data:</b> ${r.data || "Brak"}</div>
+                        <div>👤 <b>Organizator:</b> ${data.organizator || "Nieznany"}</div>
+                        ${nrBlikOrganizatora ? `<div>📞 <b>BLIK:</b> ${nrBlikOrganizatora}</div>` : ''}
+                        <div>💰 <b>Koszt:</b> ${r.typ_ceny} (${aktualnyKoszt.toFixed(2)} zł / os.)</div>
+                        <div>📝 <b>Uwagi:</b> ${r.uwagi || 'Brak'}</div>
+                    </div>
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+                    <div id="rachunekWeb" style="padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; background: var(--bg-color); border: 1px solid var(--border-color);"></div>
+                    <h3 style="margin-bottom: 10px;">Lista graczy (${uczestnicyArray.length} / ${data.limit > 0 ? data.limit : "Bez limitu"}):</h3>
+                    <div class="box-lista">
+                        <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; margin: 0;">${uczestnicyArray.length > 0 ? uczestnicyArray.join('\n') : "Brak zapisanych graczy"}</p>
                     </div>
                 `;
-                listaDiv.innerHTML += htmlKafelka;
-            });
-        }
 
-        function otworzSzczegoly(idWydarzenia) {
-            aktualneWydarzenieId = idWydarzenia;
-            const mojeId = localStorage.getItem('mojeId');
-            const trescDiv = document.getElementById('szczegolyTresc');
-            const btnZapisz = document.getElementById('btnZapiszSie');
-            const btnCzat = document.getElementById('btnCzat');
-            
-            pokazEkran('ekranSzczegolow');
-            pokazLoading("Ładowanie szczegółów...");
-            btnZapisz.style.display = "none";
-            btnCzat.style.display = "none";
+                przeliczRachunekWeb(data, r.typ_ceny, aktualnyKoszt);
 
-            const payload = { action: "get_event_details", id_wydarzenia: idWydarzenia, id_uzytkownika: mojeId };
+                if(nrBlikOrganizatora) btnBlik.style.display = "block";
+                if(czyJestemZapisany || (data.moi_goscie && data.moi_goscie.length > 0)) btnZarzadzaj.style.display = "block";
+                if(data.czy_organizator) btnOrg.style.display = "block";
 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(data => {
-                ukryjLoading();
-                try {
-                    if(data.status === "success") {
-                        const r = data.raw_data || {};
-                        czyJestemZapisany = data.czy_zapisany;
-                        jestemOrganizatorem = data.czy_organizator;
-                        
-                        const kosztNum = parseFloat(r.koszt.replace(",", ".")) || 0.0;
-                        const uczestnicyArray = data.uczestnicy || [];
-                        let wszystkichAktywnych = 0;
-                        
-                        uczestnicyArray.forEach(p => {
-                            if (!p.startsWith("Rezerwa")) wszystkichAktywnych++;
-                        });
-
-                        let aktualnyKosztZaOsobe = kosztNum;
-                        // Matematyka naprawiona: szukamy pełnego polskiego słowa "ałość" lub "całość"
-                        const czyCenaDynamiczna = r.typ_ceny.toLowerCase().includes("ałość") || r.typ_ceny.toLowerCase().includes("alość") || r.typ_ceny.toLowerCase().includes("alosc");
-                        
-                        if (czyCenaDynamiczna && wszystkichAktywnych > 0) {
-                            aktualnyKosztZaOsobe = Math.ceil((kosztNum / wszystkichAktywnych) * 2) / 2.0;
-                        }
-
-                        const listaZapisanych = (uczestnicyArray.length > 0) 
-                            ? uczestnicyArray.join('\n') 
-                            : "Brak zapisanych graczy";
-                        
-                        trescDiv.innerHTML = `
-                            <h2 style="color: #1976D2; margin-top: 0; margin-bottom: 15px;">${r.nazwa || "Brak nazwy"}</h2>
-                            <div style="line-height: 1.8; font-size: 15px;">
-                                <div>📍 <strong>Miejsce:</strong> ${r.miejsce || "Nieznane"}</div>
-                                <div>📅 <strong>Data:</strong> ${r.data || "Brak"}</div>
-                                <div>👤 <strong>Organizator:</strong> ${data.organizator || "Nieznany"}</div>
-                                ${data.telefon_organizatora ? `<div>📞 <strong>BLIK:</strong> ${data.telefon_organizatora}</div>` : ''}
-                                <div>💰 <strong>Koszt:</strong> ${r.typ_ceny} (${aktualnyKosztZaOsobe.toFixed(2)} zł / os.)</div>
-                                <div>📝 <strong>Uwagi:</strong> ${r.uwagi || 'Brak'}</div>
-                            </div>
-                            
-                            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;">
-                            
-                            <div id="rachunekWeb" style="padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; background: var(--bg-color); border: 1px solid var(--border-color);"></div>
-                            
-                            <h3 style="margin-bottom: 10px;">Lista graczy (${uczestnicyArray.length}):</h3>
-                            <div class="box-lista">
-                                <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; margin: 0;">${listaZapisanych}</p>
-                            </div>
-                        `;
-
-                        przeliczRachunekWeb(data, r.typ_ceny, aktualnyKosztZaOsobe);
-
-                        btnCzat.style.display = "block";
-                        btnZapisz.style.display = "block";
-                        if (data.status_wydarzenia === "Zakończone") {
-                            btnZapisz.innerText = "MECZ ZAKOŃCZONY";
-                            btnZapisz.style.backgroundColor = "#757575";
-                            btnZapisz.disabled = true;
-                        } else {
-                            btnZapisz.disabled = false;
-                            btnZapisz.innerText = czyJestemZapisany ? "WYPISZ SIĘ" : "ZAPISZ SIĘ";
-                            btnZapisz.style.backgroundColor = czyJestemZapisany ? "#D32F2F" : "#388E3C";
-                        }
-                    } else {
-                        trescDiv.innerHTML = `<p style="color: red;">Błąd: ${data.message}</p>`;
-                    }
-                } catch(e) {
-                    console.error(e);
-                    trescDiv.innerHTML = `<p style="color: red;">Wystąpił błąd wyświetlania danych.</p>`;
-                }
-            })
-            .catch(err => {
-                ukryjLoading();
-                trescDiv.innerHTML = `<p style="color: red;">Błąd połączenia z serwerem.</p>`;
-            });
-        }
-
-        function przeliczRachunekWeb(data, typCeny, kosztOsobowy) {
-            const div = document.getElementById('rachunekWeb');
-            const czyDarmowe = (typCeny === "Darmowe" || kosztOsobowy <= 0);
-            
-            if (data.czy_organizator) {
-                if (czyDarmowe) {
-                    div.innerHTML = "Wydarzenie darmowe (Brak opłat)";
-                    div.style.color = "#388E3C";
-                    return;
-                }
-                const doZebrania = (data.ilu_innych_aktywnych || 0) * kosztOsobowy;
-                const zebrano = (data.ilu_innych_oplaconych || 0) * kosztOsobowy;
-                
-                let tekstOrg = `Jesteś organizatorem.<br>Zbiórka od reszty: ${zebrano.toFixed(2)} zł z ${doZebrania.toFixed(2)} zł`;
-                if (doZebrania > 0 && zebrano >= doZebrania) {
-                    tekstOrg += " ✅ Komplet!";
-                    div.style.color = "#388E3C";
+                btnZapisz.style.display = "block";
+                if (data.status_wydarzenia === "Zakończone") {
+                    btnZapisz.innerText = "MECZ ZAKOŃCZONY"; btnZapisz.style.backgroundColor = "#757575"; btnZapisz.disabled = true;
                 } else {
-                    div.style.color = "#1976D2";
+                    btnZapisz.disabled = false;
+                    btnZapisz.innerText = czyJestemZapisany ? "WYPISZ SIĘ" : "ZAPISZ SIĘ";
+                    btnZapisz.style.backgroundColor = czyJestemZapisany ? "#D32F2F" : "#388E3C";
                 }
-                div.innerHTML = tekstOrg;
-            } else {
-                const liczbaMoichBiletow = (data.czy_zapisany ? 1 : 0) + (data.moi_goscie ? data.moi_goscie.length : 0);
-                
-                if (liczbaMoichBiletow === 0) {
-                    div.innerHTML = "Nie grasz w tym meczu i nie masz gości na liście.";
-                    div.style.color = "gray";
-                    return;
-                }
+            } else { trescDiv.innerHTML = `<p style="color:red;">Błąd: ${data.message}</p>`; }
+        }).catch(e => { ukryjLoading(); trescDiv.innerHTML = `<p style="color:red;">Błąd połączenia z serwerem.</p>`; });
+    }
 
-                if (czyDarmowe) {
-                    div.innerHTML = "Twój koszt: 0.00 zł (Za darmo)";
-                    div.style.color = "#388E3C";
-                    return;
-                }
-
-                const mojeAktywne = (data.czy_ja_aktywny ? 1 : 0) + (data.ilu_moich_aktywnych_gosci || 0);
-                if (mojeAktywne === 0) {
-                    div.innerHTML = "Wyłącznie lista rezerwowa (brak opłat)";
-                    div.style.color = "gray";
-                    return;
-                }
-
-                const calkowityKoszt = mojeAktywne * kosztOsobowy;
-                const wplacone = ( (data.moj_status_zaplacil ? 1 : 0) + (data.ile_moich_gosci_zaplacilo || 0) ) * kosztOsobowy;
-                const doZaplaty = calkowityKoszt - wplacone;
-
-                let tekst = `Do zapłaty organizatorowi: ${doZaplaty.toFixed(2)} zł`;
-                if (wplacone > 0) tekst += `<br><small style="color: var(--text-color);">(Wpłacono już: ${wplacone.toFixed(2)} zł)</small>`;
-                
-                const czyCenaDynamiczna = typCeny.toLowerCase().includes("ałość") || typCeny.toLowerCase().includes("alosc");
-                if (czyCenaDynamiczna) {
-                    tekst += `<br><small style="color: gray;">(Uwaga: Kwota do podziału może ulec zmianie)</small>`;
-                }
-
-                div.innerHTML = tekst;
-                div.style.color = doZaplaty <= 0 ? "#388E3C" : "#D32F2F";
-            }
+    function kopiujBlik() {
+        if(nrBlikOrganizatora) {
+            navigator.clipboard.writeText(nrBlikOrganizatora).then(() => { 
+                alert("Skopiowano numer BLIK do schowka: " + nrBlikOrganizatora); 
+            }).catch(err => { 
+                alert("Nie udało się skopiować automatycznie. Numer to: " + nrBlikOrganizatora); 
+            });
         }
+    }
 
-        function obsluzZapis() {
-            const mojeId = localStorage.getItem('mojeId');
-            const mojeImie = localStorage.getItem('mojeImie');
-            const akcja = czyJestemZapisany ? "leave_event" : "join_event";
+    function przeliczRachunekWeb(data, typCeny, kosztOsobowy) {
+        const div = document.getElementById('rachunekWeb');
+        const czyDarmowe = (typCeny === "Darmowe" || kosztOsobowy <= 0);
+        
+        if (data.czy_organizator) {
+            if (czyDarmowe) { div.innerHTML = "Wydarzenie darmowe (Brak opłat)"; div.style.color = "#388E3C"; return; }
+            const doZebrania = (data.ilu_innych_aktywnych || 0) * kosztOsobowy;
+            const zebrano = (data.ilu_innych_oplaconych || 0) * kosztOsobowy;
             
-            pokazLoading(czyJestemZapisany ? "Wypisywanie..." : "Zapisywanie...");
+            let tekstOrg = `Jesteś organizatorem.<br>Zbiórka od reszty: ${zebrano.toFixed(2)} zł z ${doZebrania.toFixed(2)} zł`;
+            if (doZebrania > 0 && zebrano >= doZebrania) { tekstOrg += " ✅ Komplet!"; div.style.color = "#388E3C"; }
+            else { div.style.color = "#1976D2"; }
+            div.innerHTML = tekstOrg;
+        } else {
+            const moiGoscie = data.moi_goscie || [];
+            const liczbaMoichBiletow = (data.czy_zapisany ? 1 : 0) + moiGoscie.length;
+            if (liczbaMoichBiletow === 0) { div.innerHTML = "Nie grasz w tym meczu i nie masz gości."; div.style.color = "gray"; return; }
+            if (czyDarmowe) { div.innerHTML = "Twój koszt: 0.00 zł (Za darmo)"; div.style.color = "#388E3C"; return; }
 
-            const payload = { action: akcja, id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId, imie: mojeImie };
+            const mojeAktywne = (data.czy_ja_aktywny ? 1 : 0) + (data.ilu_moich_aktywnych_gosci || 0);
+            if (mojeAktywne === 0) { div.innerHTML = "Jesteś na liście rezerwowej (brak opłat)"; div.style.color = "gray"; return; }
 
-            fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
-            .then(res => res.json())
-            .then(data => {
-                otworzSzczegoly(aktualneWydarzenieId);
-            })
-            .catch(err => {
-                ukryjLoading();
-                alert("Wystąpił błąd sieciowy podczas akcji zapisu.");
-            });
+            const wkladDoPuli = mojeAktywne * kosztOsobowy;
+            const wplaconeOrg = ((data.moj_status_zaplacil ? 1 : 0) + (data.ile_moich_gosci_zaplacilo || 0)) * kosztOsobowy;
+            
+            // Liczymy gości, którzy zwrócili Ci pieniądze z podanej przez serwer tablicy
+            let oddanePrzezGosci = 0;
+            moiGoscie.forEach(g => { if(g.czy_zaplacil_mi) oddanePrzezGosci += kosztOsobowy; });
+            
+            let tekst = `Twój wkład do puli (Ty + Goście): ${wkladDoPuli.toFixed(2)} zł<br>`;
+            if (data.ilu_moich_aktywnych_gosci > 0) {
+                tekst += `<span style="color: #1976D2; font-size: 14px;">Odzyskane od gości: ${oddanePrzezGosci.toFixed(2)} zł</span><br>`;
+            }
+            
+            const doZaplaty = wkladDoPuli - wplaconeOrg;
+            tekst += `<br>Zaległość dla organizatora: <span style="color: ${doZaplaty <= 0 ? '#388E3C' : '#D32F2F'};">${doZaplaty.toFixed(2)} zł</span>`;
+            if (wplaconeOrg > 0) tekst += `<br><small style="color: var(--text-color); font-weight: normal;">(Przekazano już: ${wplaconeOrg.toFixed(2)} zł)</small>`;
+
+            div.innerHTML = tekst;
+            div.style.color = "var(--text-color)";
+        }
+    }
+
+    function potwierdzZapis() {
+        if (czyJestemZapisany) {
+            if (confirm("Czy na pewno chcesz wypisać się z tego wydarzenia? Pamiętaj, że możesz spaść na koniec kolejki!")) obsluzZapis();
+        } else { obsluzZapis(); }
+    }
+
+    function obsluzZapis() {
+        const mojeId = localStorage.getItem('mojeId');
+        const mojeImie = localStorage.getItem('mojeImie');
+        const akcja = czyJestemZapisany ? "leave_event" : "join_event";
+        
+        pokazLoading(czyJestemZapisany ? "Wypisywanie..." : "Zapisywanie...");
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: akcja, id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId, imie: mojeImie }) })
+        .then(r => r.json()).then(data => {
+            if(data.status === "success") { otworzSzczegoly(aktualneWydarzenieId); }
+            else { ukryjLoading(); alert("Błąd: " + data.message); }
+        }).catch(err => { ukryjLoading(); alert("Wystąpił błąd sieciowy."); });
+    }
+	
+	// ================= TWORZENIE I EDYCJA WYDARZENIA =================
+
+    function otworzTworzenieWydarzenia() {
+        document.getElementById('edycjaWydarzenieId').value = "";
+        document.getElementById('tytulTworzenia').innerText = "Nowe Wydarzenie";
+        document.getElementById('noweNazwa').value = "";
+        document.getElementById('noweMiejsce').value = "";
+        document.getElementById('noweData').value = "";
+        document.getElementById('noweCzas').value = "";
+        document.getElementById('noweTypCeny').value = "Darmowe";
+        document.getElementById('noweKoszt').value = "0";
+        document.getElementById('noweKosztDiv').style.display = "none";
+        document.getElementById('noweLimit').value = "0";
+        document.getElementById('noweUwagi').value = "";
+        
+        document.getElementById('btnWrocTworzenie').onclick = function() { pokazEkran('ekranGlowny'); };
+        pokazEkran('ekranTworzeniaWydarzenia');
+    }
+
+    function wczytajDoEdycji() {
+        const mojeId = localStorage.getItem('mojeId');
+        pokazLoading("Pobieranie danych do edycji...");
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_event_details", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success" && data.raw_data) {
+                const r = data.raw_data;
+                document.getElementById('edycjaWydarzenieId').value = aktualneWydarzenieId;
+                document.getElementById('tytulTworzenia').innerText = "Edycja Wydarzenia";
+                document.getElementById('noweNazwa').value = r.nazwa || "";
+                document.getElementById('noweMiejsce').value = r.miejsce || "";
+                
+                // Rozdzielanie daty i czasu (skrypt zwraca je złączone spacją)
+                let d = r.data || "";
+                let parts = d.split(" ");
+                document.getElementById('noweData').value = parts[0] || "";
+                document.getElementById('noweCzas').value = parts[1] || "";
+                
+                document.getElementById('noweTypCeny').value = r.typ_ceny || "Darmowe";
+                document.getElementById('noweKosztDiv').style.display = (r.typ_ceny === 'Darmowe' ? 'none' : 'block');
+                document.getElementById('noweKoszt').value = r.koszt ? parseFloat(r.koszt.replace(",", ".")) : "0";
+                document.getElementById('noweLimit').value = r.limit || "0";
+                document.getElementById('noweUwagi').value = r.uwagi || "";
+                
+                document.getElementById('btnWrocTworzenie').onclick = function() { otworzPanelOrganizatora(); };
+                pokazEkran('ekranTworzeniaWydarzenia');
+            } else { alert("Błąd wczytywania danych do edycji."); }
+        }).catch(e => { ukryjLoading(); alert("Błąd sieciowy."); });
+    }
+
+    function zapiszWydarzenie() {
+        const idEdytowanego = document.getElementById('edycjaWydarzenieId').value;
+        const nazwa = document.getElementById('noweNazwa').value.trim();
+        const miejsce = document.getElementById('noweMiejsce').value.trim();
+        const dataWyd = document.getElementById('noweData').value;
+        const czasWyd = document.getElementById('noweCzas').value;
+        const typCeny = document.getElementById('noweTypCeny').value;
+        const koszt = document.getElementById('noweKoszt').value;
+        const limit = document.getElementById('noweLimit').value;
+        const uwagi = document.getElementById('noweUwagi').value.trim();
+        
+        const mojeId = localStorage.getItem('mojeId');
+
+        if(!nazwa || !miejsce || !dataWyd || !czasWyd) { alert("Wypełnij nazwę, miejsce, datę i godzinę!"); return; }
+
+        // Twój serwer oczekuje połączonej daty pod zmienną "data_wydarzenia"
+        const pelnaData = dataWyd + " " + czasWyd;
+        const akcja = idEdytowanego ? "edit_event" : "create_event";
+        
+        pokazLoading(idEdytowanego ? "Zapisywanie zmian..." : "Tworzenie wydarzenia...");
+
+        let payload = { 
+            action: akcja, 
+            nazwa: nazwa, 
+            data_wydarzenia: pelnaData, 
+            miejsce: miejsce, 
+            typ_ceny: typCeny, 
+            koszt: koszt, 
+            limit: limit, 
+            uwagi: uwagi 
+        };
+
+        // Zgodnie z analizą backendu: 
+        if (idEdytowanego) {
+            payload.id_wydarzenia = idEdytowanego;
+            payload.id_uzytkownika = mojeId; // Backend wymaga tego do weryfikacji uprawnień edycji
+        } else {
+            payload.organizator_id = mojeId; // Backend używa tego jako właściciela nowego meczu
         }
 
-        // --- PWA - Rejestracja Service Workera ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then((reg) => console.log('Service Worker pomyślnie zarejestrowany.', reg))
-                    .catch((err) => console.log('Błąd rejestracji Service Workera.', err));
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                alert(idEdytowanego ? "Zmiany zapisane." : "Wydarzenie zostało utworzone!");
+                if(idEdytowanego) otworzSzczegoly(idEdytowanego);
+                else otworzFiltryWydarzen();
+            } else { alert("Błąd: " + data.message); }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+    }
+
+    // ================= GLOBALNE ROZLICZENIA =================
+
+    function otworzRozliczeniaGlobalne() {
+        pokazEkran('ekranRozliczen');
+        const mojeId = localStorage.getItem('mojeId');
+        pokazLoading("Pobieranie rozliczeń...");
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_debts", id_uzytkownika: mojeId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                const wiszaMi = data.wisza_mi_zgrupowane || [];
+                const wiszeKomus = data.wisze_komus_zgrupowane || [];
+                
+                // Front-end musi samodzielnie zsumować łączną kwotę ze zgrupowanych obiektów
+                let sumaMiWisza = 0;
+                wiszaMi.forEach(item => sumaMiWisza += parseFloat(item.laczna_kwota || 0));
+                document.getElementById('sumaMiWisza').innerText = sumaMiWisza.toFixed(2);
+                
+                let sumaWisze = 0;
+                wiszeKomus.forEach(item => sumaWisze += parseFloat(item.laczna_kwota || 0));
+                document.getElementById('sumaWisze').innerText = sumaWisze.toFixed(2);
+                
+                renderZgrupowaneDlugi(wiszaMi, 'listaMiWisza', 'wiszą Ci');
+                renderZgrupowaneDlugi(wiszeKomus, 'listaWisze', 'wisisz');
+            } else { alert("Błąd: " + data.message); }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+    }
+
+    function renderZgrupowaneDlugi(tablica, divId, typ) {
+        const div = document.getElementById(divId);
+        div.innerHTML = "";
+        
+        if(!tablica || tablica.length === 0) { 
+            div.innerHTML = "<p style='text-align:center; color:gray;'>Brak rozliczeń w tej kategorii.</p>"; 
+            return; 
+        }
+        
+        tablica.forEach(grup => {
+            let szczegolyHTML = grup.szczegoly.map(sz => 
+                `<div style="font-size: 13px; margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--border-color);">
+                    <b>${sz.wydarzenie}</b>: ${sz.kwota} zł <span style="color:gray;">(za ${sz.za_ile_osob} os.)</span>
+                </div>`
+            ).join('');
+
+            div.innerHTML += `
+                <div class="box-lista" style="margin-bottom: 10px;">
+                    <div class="flex-row">
+                        <span style="font-weight: bold; color: #1976D2;">${grup.osoba}</span>
+                        <span style="font-weight: bold; color: ${typ === 'wisisz' ? '#D32F2F' : '#388E3C'};">${parseFloat(grup.laczna_kwota).toFixed(2)} zł</span>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        ${szczegolyHTML}
+                    </div>
+                </div>`;
+        });
+    }
+	
+	// ================= MOJA EKIPA (ZARZĄDZANIE GOŚĆMI) =================
+
+    let cacheWszyscyGracze = [];
+
+    function otworzMojaEkipe() {
+        pokazEkran('ekranMojaEkipa');
+        document.getElementById('nazwaGoscia').value = "";
+        document.getElementById('podpowiedziGosci').style.display = "none";
+        odswiezMojaEkipe();
+    }
+
+    function odswiezMojaEkipe() {
+        const mojeId = localStorage.getItem('mojeId');
+        pokazLoading("Ładowanie ekipy...");
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_event_details", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                const div = document.getElementById('listaMojejEkipy');
+                div.innerHTML = "";
+                const goscie = data.moi_goscie || [];
+                
+                if(goscie.length === 0) { 
+                    div.innerHTML = "<p style='text-align:center;'>Nie masz dodanych żadnych gości na ten mecz.</p>"; 
+                } else {
+                    goscie.forEach(g => {
+                        // Flaga czy_zaplacil_mi odpowiada Kolumnie J w Twoim arkuszu
+                        const isChecked = g.czy_zaplacil_mi ? "checked" : "";
+                        div.innerHTML += `
+                            <div class="flex-row" style="background: var(--card-bg); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color);">
+                                <span style="font-weight: bold;">${g.imie}</span>
+                                <div class="checkbox-container" style="margin-bottom: 0;">
+                                    <input type="checkbox" onchange="zaznaczWewnetrznaWplate('${g.id_goscia}', this.checked)" ${isChecked}> Oddał mi
+                                </div>
+                            </div>`;
+                    });
+                }
+            }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia z serwerem."); });
+    }
+
+    function szukajGraczaDoEkipy(fraza) {
+        const div = document.getElementById('podpowiedziGosci');
+        if(fraza.length < 2) { div.style.display = "none"; return; }
+        
+        // Cache zapobiega bombardowaniu arkusza Apps Script przy każdej wpisanej literce
+        if(cacheWszyscyGracze.length === 0) {
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_all_users" }) })
+            .then(r => r.json()).then(data => {
+                if(data.status === "success") {
+                    cacheWszyscyGracze = data.users || [];
+                    filtrujIWyswietlGraczy(fraza, div);
+                }
+            });
+        } else {
+            filtrujIWyswietlGraczy(fraza, div);
+        }
+    }
+
+    function filtrujIWyswietlGraczy(fraza, div) {
+        const f = fraza.toLowerCase();
+        const wynik = cacheWszyscyGracze.filter(u => u.imie && u.imie.toLowerCase().includes(f));
+        div.innerHTML = "";
+        
+        if(wynik.length > 0) {
+            wynik.forEach(u => {
+                // Używamy imie_krotkie z Twojego formatu
+                div.innerHTML += `<div class="dropdown-item" onclick="dodajGraczaDoEkipy('${u.id}', '${u.imie_krotkie}')">${u.imie}</div>`;
+            });
+            div.style.display = "block";
+        } else {
+            div.style.display = "none";
+        }
+    }
+
+    function dodajGraczaDoEkipy(idGracza, imieGoscia) {
+        document.getElementById('podpowiedziGosci').style.display = "none";
+        document.getElementById('nazwaGoscia').value = "";
+        
+        const mojeId = localStorage.getItem('mojeId');
+        const mojeImie = localStorage.getItem('mojeImie'); // Apps Script potrzebuje Twojego imienia, by zbudować nazwę: Gość (Gość: Ty)
+        
+        pokazLoading("Dodawanie gościa...");
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "add_guest", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId, id_goscia: idGracza, imie_goscia: imieGoscia, imie: mojeImie }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") odswiezMojaEkipe();
+            else alert("Błąd: " + data.message);
+        });
+    }
+
+    function zaznaczWewnetrznaWplate(idGoscia, stan) {
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "toggle_internal_payment", id_wydarzenia: aktualneWydarzenieId, id_goscia: idGoscia, wartosc: stan }) });
+    }
+
+    // ================= PANEL ORGANIZATORA =================
+
+    let listaDluznikowWydarzenia = [];
+
+    function otworzPanelOrganizatora() {
+        pokazEkran('ekranPanelOrganizatora');
+        odswiezPanelOrganizatora();
+    }
+
+    function odswiezPanelOrganizatora() {
+        pokazLoading("Ładowanie listy graczy...");
+        listaDluznikowWydarzenia = [];
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "get_event_manage_details", id_wydarzenia: aktualneWydarzenieId }) })
+        .then(r => r.json()).then(data => {
+            ukryjLoading();
+            if(data.status === "success") {
+                const div = document.getElementById('listaZarzadzaniaGraczami');
+                div.innerHTML = "";
+                const uczestnicy = data.uczestnicy || [];
+                
+                if(uczestnicy.length === 0) { div.innerHTML = "<p>Brak zapisanych osób na liście.</p>"; return; }
+
+                uczestnicy.forEach(u => {
+                    // Budowanie paczki do grupowego odhaczania dla mark_debts_paid
+                    if (!u.czy_zaplacil && u.czy_gra) {
+                        listaDluznikowWydarzenia.push({ id_wydarzenia: aktualneWydarzenieId, id_dluznika: u.id_uzytkownika });
+                    } else if (!u.czy_gra && u.goscie) {
+                        let maDlugGosci = false;
+                        u.goscie.forEach(g => { if(!g.czy_zaplacil) maDlugGosci = true; });
+                        if(maDlugGosci) listaDluznikowWydarzenia.push({ id_wydarzenia: aktualneWydarzenieId, id_dluznika: u.id_uzytkownika });
+                    }
+
+                    const isChecked = u.czy_zaplacil ? "checked" : "";
+                    const kolorTla = u.czy_gra ? "var(--card-bg)" : "#f9f9f9";
+                    const napisTyp = u.czy_gra ? "Gracz" : "Tylko Goście";
+
+                    let htmlGosci = "";
+                    if(u.goscie && u.goscie.length > 0) {
+                        u.goscie.forEach(g => {
+                            const isGChecked = g.czy_zaplacil ? "checked" : "";
+                            htmlGosci += `
+                                <div class="flex-row" style="margin-top: 10px; padding-left: 20px; border-left: 2px solid #ccc; font-size: 14px;">
+                                    <span style="font-weight: bold; color: #555;">↳ ${g.imie}</span>
+                                    <div class="flex-row" style="gap: 10px;">
+                                        <div class="checkbox-container" style="margin-bottom: 0;">
+                                            <input type="checkbox" onchange="zaznaczWplate('${g.id_goscia}', this.checked)" ${isGChecked}> Opłacony
+                                        </div>
+                                        <button class="red-btn" style="width: auto; height: 28px; padding: 0 10px; font-size: 11px; margin: 0;" onclick="usunGracza('${g.id_goscia}')">Usuń</button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    div.innerHTML += `
+                        <div style="background: ${kolorTla}; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border-color);">
+                            <div class="flex-row" style="margin-bottom: 10px;">
+                                <div>
+                                    <span style="font-weight: bold; color: #1976D2;">${u.nazwa_wyswietlana}</span>
+                                    <span style="font-size: 12px; color: gray; margin-left: 5px;">(${napisTyp})</span>
+                                </div>
+                                <div class="flex-row" style="gap: 5px;">
+                                    <button class="grey-btn" style="width: 32px; height: 32px; padding: 0; margin: 0; display: ${u.czy_gra ? 'inline-block' : 'none'}; font-size: 18px;" onclick="przesunGracza('${u.id_uzytkownika}', 'up')">↑</button>
+                                    <button class="grey-btn" style="width: 32px; height: 32px; padding: 0; margin: 0; display: ${u.czy_gra ? 'inline-block' : 'none'}; font-size: 18px;" onclick="przesunGracza('${u.id_uzytkownika}', 'down')">↓</button>
+                                    <button class="red-btn" style="width: auto; height: 32px; margin: 0; padding: 0 10px; font-size: 12px; display: ${u.czy_gra ? 'inline-block' : 'none'};" onclick="usunGracza('${u.id_uzytkownika}')">Wyrzuć</button>
+                                </div>
+                            </div>
+                            <div class="flex-row" style="display: ${u.czy_gra ? 'flex' : 'none'};">
+                                <div class="checkbox-container" style="margin-bottom: 0;">
+                                    <input type="checkbox" onchange="zaznaczWplate('${u.id_uzytkownika}', this.checked)" ${isChecked}> Opłacony
+                                </div>
+                            </div>
+                            ${htmlGosci}
+                        </div>`;
+                });
+            }
+        }).catch(e => { ukryjLoading(); alert("Błąd połączenia."); });
+    }
+
+    function usunGracza(idKicked) {
+        if(confirm("Czy na pewno chcesz usunąć tę osobę z wydarzenia?")) {
+            pokazLoading("Wyrzucanie...");
+            // Backend wymaga "kicked_user_id"
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "kick_player", id_wydarzenia: aktualneWydarzenieId, kicked_user_id: idKicked }) })
+            .then(r => r.json()).then(data => { ukryjLoading(); odswiezPanelOrganizatora(); });
+        }
+    }
+
+    function przesunGracza(userId, kierunek) {
+        pokazLoading("Przesuwanie...");
+        // Zgodnie z backendem: action: move_player, id_wydarzenia, user_id, direction ("up" lub "down")
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "move_player", id_wydarzenia: aktualneWydarzenieId, user_id: userId, direction: kierunek }) })
+        .then(r => r.json()).then(data => { ukryjLoading(); odswiezPanelOrganizatora(); });
+    }
+
+    function zaznaczWplate(idUczestnika, stan) {
+        // Backend oczekuje formatu: id_uzytkownika = id odhaczanej osoby, pole = "czy_zaplacil", wartosc = true/false
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "toggle_payment", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: idUczestnika, pole: "czy_zaplacil", wartosc: stan }) });
+    }
+
+    function rozliczWszystkieDlugi() {
+        if(listaDluznikowWydarzenia.length === 0) {
+            alert("Wszyscy na liście są już oznaczeni jako opłaceni!"); return;
+        }
+        if(confirm(`Zostanie masowo oznaczonych ${listaDluznikowWydarzenia.length} kont i wszystkich ich gości jako opłaconych. Kontynuować?`)) {
+            pokazLoading("Masowe rozliczanie...");
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "mark_debts_paid", debts: listaDluznikowWydarzenia }) })
+            .then(r => r.json()).then(data => { 
+                ukryjLoading(); 
+                alert("Wszystkie długi z tego meczu zostały rozliczone!"); 
+                odswiezPanelOrganizatora(); 
             });
         }
-    </script>
+    }
+
+    function usunWydarzenie() {
+        if(confirm("UWAGA! Czy trwale USUNĄĆ to wydarzenie i wszystkie jego zapisy? Tej akcji nie da się cofnąć!")) {
+            const mojeId = localStorage.getItem('mojeId');
+            pokazLoading("Usuwanie wydarzenia...");
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "delete_event_by_organizer", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId }) })
+            .then(r => r.json()).then(data => { ukryjLoading(); alert("Wydarzenie usunięte z bazy."); pokazEkran('ekranGlowny'); });
+        }
+    }
+
+    function zakonczWydarzenie() {
+        if(confirm("Czy na pewno ZAKOŃCZYĆ to wydarzenie? Zablokuje to możliwość wypisywania się z list.")) {
+            const mojeId = localStorage.getItem('mojeId');
+            pokazLoading("Zakańczanie wydarzenia...");
+            fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: "end_event", id_wydarzenia: aktualneWydarzenieId, id_uzytkownika: mojeId }) })
+            .then(r => r.json()).then(data => { ukryjLoading(); alert("Wydarzenie przeniesione do zakończonych."); pokazEkran('ekranGlowny'); });
+        }
+    }
+
+    // Dodanie prostego zabezpieczenia pod Service Workery (jeśli to wrzucisz jako PWA)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch((err) => console.log('Brak Service Workera lub błąd', err));
+        });
+    }
+</script>
 </body>
 </html>
-
-    </body>
-</html>
-
-
